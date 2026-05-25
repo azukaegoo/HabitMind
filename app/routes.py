@@ -12,6 +12,15 @@ def home():
     return render_template("index.html")
 
 
+@main.route("/signup")
+def signup():
+    return render_template("signup.html")
+
+
+@main.route("/login")
+def login():
+    return render_template("login.html")
+
 @main.route("/submit", methods=["POST"])
 def submit():
     try:
@@ -24,4 +33,5 @@ def submit():
         logger.exception("Database error while saving button click: %s", e)
         flash("Could not save button click.")
     return redirect(url_for("main.home"))
+
 
