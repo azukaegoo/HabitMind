@@ -12,19 +12,6 @@ def home():
     return render_template("home.html")
 
 
-@main.route("/submit", methods=["POST"])
-def submit():
-    try:
-        one_button = OneAppButton(value="button_clicked")
-        db.session.add(one_button)
-        db.session.commit()
-        flash("Button click saved successfully.")
-    except Exception as e:
-        db.session.rollback()
-        logger.exception("Database error while saving button click: %s", e)
-        flash("Could not save button click.")
-    return redirect(url_for("main.home"))
-
 @main.route("/signup")
 def signup():
     return render_template("signup.html")
@@ -38,3 +25,17 @@ def login():
 @main.route("/goals")
 def goals():
     return render_template("goals.html")
+
+
+@main.route("/submit", methods=["POST"])
+def submit():
+    try:
+        one_button = OneAppButton(value="button_clicked")
+        db.session.add(one_button)
+        db.session.commit()
+        flash("Button click saved successfully.")
+    except Exception as e:
+        db.session.rollback()
+        logger.exception("Database error while saving button click: %s", e)
+        flash("Could not save button click.")
+    return redirect(url_for("main.home"))
