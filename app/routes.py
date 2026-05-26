@@ -9,7 +9,7 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("home.html")
 
 
 @main.route("/signup")
@@ -20,6 +20,12 @@ def signup():
 @main.route("/login")
 def login():
     return render_template("login.html")
+
+
+@main.route("/goals")
+def goals():
+    return render_template("goals.html")
+
 
 @main.route("/submit", methods=["POST"])
 def submit():
@@ -33,5 +39,3 @@ def submit():
         logger.exception("Database error while saving button click: %s", e)
         flash("Could not save button click.")
     return redirect(url_for("main.home"))
-
-
