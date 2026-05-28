@@ -1,4 +1,6 @@
+import sys
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash
+from flask_login import login_user, logout_user  
 from .models import db, User
 
 auth_bp = Blueprint('auth', __name__)
@@ -29,6 +31,7 @@ def register():
 def old_register_fallback():
     return register()
 
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -37,15 +40,19 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password):
-            session['user_id'] = user.id
-            # Redirect to dashboard
+            login_user(user)
+            
+            print(f"DEBUG: User logged in - Email: {user.email}, Plan: {user.plan}", flush=True)
+            print(f"DEBUG: Is user premium? -> {user.is_premium()}", flush=True)
+            
             return redirect(url_for('main.dashboard'))
         else:
             flash('Invalid email or password.')
             
     return render_template('login.html')
 
+
 @auth_bp.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    logout_user()
     return redirect(url_for('auth.login'))

@@ -2,24 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from functools import wraps
 from . import db
 import logging
+from flask_login import login_required, current_user
 
 logger = logging.getLogger(__name__)
 main = Blueprint("main", __name__)
 
-# Login required decorator: Redirects unauthorized users to the login page
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('Please log in to access this page.')
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
 @main.route("/")
 def home():
-    # If already logged in, go to dashboard. Otherwise, go to login.
-    if 'user_id' in session:
+    if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
     return redirect(url_for('auth.login'))
 
