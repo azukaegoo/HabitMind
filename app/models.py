@@ -9,7 +9,10 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    plan = db.Column(db.String(20), default='free') 
+    plan = db.Column(db.String(20), default='free') # 'free' or 'premium'
+    
+    selected_goals = db.Column(db.String(200), nullable=True) 
+    
     created_at = db.Column(db.DateTime(timezone=True),
                            default=lambda: datetime.now(UTC),
                            nullable=False)

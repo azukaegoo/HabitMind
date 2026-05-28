@@ -16,9 +16,18 @@ def home():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-   return render_template("home.html")
+    return render_template("home.html")
 
-@main.route("/goals")
+@main.route("/goals", methods=['GET', 'POST'])
 @login_required
 def goals():
+    if request.method == 'POST':
+        selected_goals = request.form.get('goals')
+        
+        current_user.selected_goals = selected_goals
+        db.session.commit()
+        
+        print(f"DEBUG: Saved goals for {current_user.email} -> {selected_goals}", flush=True)
+        return redirect(url_for('main.dashboard'))
+        
     return render_template("goals.html")
