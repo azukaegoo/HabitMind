@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're All Set — HabitMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  
+</head>
+<body>
+
+  <div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%);">
+
+    <!-- Ambient glow blobs -->
+    <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-25" style="background: radial-gradient(ellipse, #34d399 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute bottom-0 -right-40 w-[500px] h-[500px] rounded-full opacity-15" style="background: radial-gradient(ellipse, #10b981 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute top-1/2 -left-32 w-[400px] h-[400px] rounded-full opacity-10" style="background: radial-gradient(ellipse, #059669 0%, transparent 70%);"></div>
+
+    <!-- Subtle grid overlay -->
+    <div class="pointer-events-none absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 64px 64px;"></div>
+
+    <!-- Floating sparkles -->
+    <svg class="sparkle" style="top: 12%; left: 18%; animation-delay: 0s;" width="20" height="20" viewBox="0 0 24 24" fill="#6ee7b7"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 20%; right: 22%; animation-delay: 0.5s;" width="14" height="14" viewBox="0 0 24 24" fill="#34d399"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 38%; left: 8%; animation-delay: 1s;" width="16" height="16" viewBox="0 0 24 24" fill="#a7f3d0"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 65%; right: 12%; animation-delay: 1.5s;" width="22" height="22" viewBox="0 0 24 24" fill="#6ee7b7"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 72%; left: 20%; animation-delay: 2s;" width="12" height="12" viewBox="0 0 24 24" fill="#34d399"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 28%; left: 45%; animation-delay: 0.8s;" width="10" height="10" viewBox="0 0 24 24" fill="#a7f3d0"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+    <svg class="sparkle" style="top: 80%; left: 50%; animation-delay: 1.3s;" width="14" height="14" viewBox="0 0 24 24" fill="#6ee7b7"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+      <!-- Header -->
+      <header class="px-6 pt-6 pb-2 flex items-center justify-center max-w-3xl mx-auto w-full">
+        <a href="/" class="flex items-center gap-3 no-underline">
+          <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+              <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+              <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+              <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+              <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>
+              <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+              <path d="M19.938 10.5a4 4 0 0 1 .585.396"/>
+              <path d="M6 18a4 4 0 0 1-1.967-.516"/>
+              <path d="M19.967 17.484A4 4 0 0 1 18 18"/>
+            </svg>
+          </div>
+          <span class="text-white font-bold text-lg tracking-tight">HabitMind</span>
+        </a>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col items-center justify-center px-4 py-8 md:py-12">
+        <div class="w-full max-w-xl mx-auto text-center">
+
+          <!-- Progress Indicator (all 3 dots filled) -->
+          <div class="mb-12 fade-in-up">
+            <p class="text-emerald-300/70 text-sm font-medium mb-4">Step 3 of 3 · Complete</p>
+            <div class="flex gap-2 justify-center">
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+            </div>
+          </div>
+
+          <!-- Brain logo with success ring -->
+          <div class="relative inline-block mb-10 float">
+            <!-- Outer glow rings -->
+            <div class="absolute inset-0 -m-8 rounded-full pulse-glow" style="background: radial-gradient(circle, rgba(110,231,183,0.4) 0%, transparent 70%); filter: blur(15px);"></div>
+            <div class="absolute inset-0 -m-4 rounded-full pulse-glow" style="background: radial-gradient(circle, rgba(52,211,153,0.5) 0%, transparent 70%); filter: blur(8px); animation-delay: 0.5s;"></div>
+
+            <!-- Main logo container -->
+            <div class="relative w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl" style="background: linear-gradient(135deg, #ffffff 0%, #d1fae5 100%);">
+              <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+                <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+                <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+                <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+                <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>
+                <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+                <path d="M19.938 10.5a4 4 0 0 1 .585.396"/>
+                <path d="M6 18a4 4 0 0 1-1.967-.516"/>
+                <path d="M19.967 17.484A4 4 0 0 1 18 18"/>
+              </svg>
+            </div>
+
+            <!-- Checkmark badge (top-right of logo) -->
+            <div class="pop-in absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center shadow-xl" style="background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Badge -->
+          <div class="fade-in-up delay-400 flex justify-center mb-6">
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold tracking-wider uppercase">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.5 9 21 10.5 13.5 12 12 19 10.5 12 3 10.5 10.5 9 Z"/></svg>
+              Onboarding complete
+            </span>
+          </div>
+
+          <!-- Main heading -->
+          <h1 class="fade-in-up delay-600 text-4xl md:text-6xl font-extrabold text-white mb-5 leading-[1.05] tracking-tight">
+            You're
+            <span class="bg-clip-text text-transparent" style="background-image: linear-gradient(90deg, #34d399, #6ee7b7);">all set!</span>
+          </h1>
+
+          <!-- Encouragement message -->
+          <p class="fade-in-up delay-800 text-lg text-emerald-100/80 mb-3 leading-relaxed max-w-md mx-auto">
+            Your wellness journey starts now. Small steps, every day — that's how change happens. 💚
+          </p>
+          <p class="fade-in-up delay-800 text-sm text-emerald-300/60 mb-12">
+            We're so glad you're here.
+          </p>
+
+          <!-- Start button -->
+          <form action="/dashboard" method="GET" class="fade-in-up delay-1000">
+            <button type="submit" class="btn-primary group inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl font-bold text-emerald-900 text-lg shadow-xl" style="background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);">
+              Start my journey
+              <svg class="arrow-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </button>
+          </form>
+
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="text-center py-6 px-4">
+        <p class="text-emerald-500/50 text-xs">
+          Track habits · Build streaks · Understand yourself
+        </p>
+      </footer>
+
+    </div>
+  </div>
+
+</body>
+</html>

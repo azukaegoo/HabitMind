@@ -5,42 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In — HabitMind</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-
-    .input-field {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: #ffffff;
-      border-radius: 0.75rem;
-      padding: 0.75rem 1rem;
-      font-size: 0.9375rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .input-field::placeholder { color: rgba(167,243,208,0.35); }
-    .input-field:focus {
-      border-color: #34d399;
-      box-shadow: 0 0 0 3px rgba(52,211,153,0.15);
-    }
-
-    .btn-primary { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .btn-primary:hover {
-      transform: scale(1.025);
-      box-shadow: 0 20px 40px rgba(52,211,153,0.25);
-    }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:hover .arrow-icon { transform: translateX(4px); }
-    .arrow-icon { transition: transform 0.2s ease; display: inline-block; }
-
-    .back-link { transition: background-color 0.2s ease, color 0.2s ease; }
-    .back-link:hover { background-color: rgba(255,255,255,0.08); color: #ffffff; }
-
-    .text-link { transition: color 0.2s ease; }
-    .text-link:hover { color: #6ee7b7; text-decoration: underline; }
-  </style>
+  
 </head>
 <body>
 
@@ -157,7 +122,7 @@
             <div class="flex flex-col gap-1.5">
               <div class="flex items-center justify-between">
                 <label for="password" class="text-emerald-100 text-sm font-medium">Password</label>
-                <a href="#" class="text-link text-emerald-300 text-xs font-medium no-underline">Forgot password?</a>
+                <a href="/forgot-password" class="text-link text-emerald-300 text-xs font-medium no-underline">Forgot password?</a>
               </div>
               <input
                 id="password"
