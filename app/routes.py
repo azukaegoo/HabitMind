@@ -42,17 +42,3 @@ def old_login():
 @login_required
 def goals():
     return render_template("goals.html")
-
-@main.route("/submit", methods=["POST"])
-@login_required
-def submit():
-    try:
-        one_button = OneAppButton(value="button_clicked")
-        db.session.add(one_button)
-        db.session.commit()
-        flash("Button click saved successfully.")
-    except Exception as e:
-        db.session.rollback()
-        logger.exception("Database error while saving button click: %s", e)
-        flash("Could not save button click.")
-    return redirect(url_for("main.dashboard"))
