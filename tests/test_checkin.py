@@ -53,7 +53,7 @@ def test_checkin_integration_flow(client, app, authenticated_user):
         sess['_user_id'] = str(authenticated_user.id)
         sess['_fresh'] = True
 
-    # ---- Step 1: Initial Check-In (POST) ----
+   # ---- Step 1: Initial Check-In (POST) ----
     form_data = {
         "mood_score": "4",
         "habits": "exercise, reading",
@@ -73,22 +73,29 @@ def test_checkin_integration_flow(client, app, authenticated_user):
         assert checkin.mood_score == 4
         assert checkin.habits == "exercise, reading"
 
-    # ---- Step 2: Update Check-In (Same Date) ----
-    updated_form_data = {
+ # ---- Step 2: Attempt Duplicate Check-In (Same Date) ----
+    duplicate_form_data = {
         "mood_score": "5",
         "habits": "exercise, coding",
-        "note": "Updated note: finished the backend logic."
+        "note": "Trying to cheat the system!"
     }
     
-    response_update = client.post('/checkin', data=updated_form_data, follow_redirects=True)
-    assert response_update.status_code == 200
+    response_duplicate = client.post('/checkin', data=duplicate_form_data, follow_redirects=True)
+    assert response_duplicate.status_code == 200
     
-    # Verify the database record was updated, not duplicated
+    # Note: Removed the HTML string assertion because the frontend UI 
+    # for rendering flash messages might not be merged yet.
+    # We will strictly verify the backend behavior via the database.
+    
+    # Verify the database still has exactly 1 record, and it was NOT updated
     with app.app_context():
         all_checkins = CheckIn.query.filter_by(user_id=authenticated_user.id).all()
-        assert len(all_checkins) == 1  # Should still be exactly 1 record due to UniqueConstraint
         
-        updated_checkin = all_checkins[0]
-        assert updated_checkin.mood_score == 5
-        assert updated_checkin.habits == "exercise, coding"
-        assert updated_checkin.note == "Updated note: finished the backend logic."
+        # Ensures the second request was successfully blocked
+        assert len(all_checkins) == 1  
+        
+        # The data should remain exactly as it was from the FIRST request
+        original_checkin = all_checkins[0]
+        assert original_checkin.mood_score == 4  # Should NOT be updated to 5
+        assert original_checkin.habits == "exercise, reading"
+        assert original_checkin.note == "Studied hard today!"

@@ -51,24 +51,26 @@ def checkin():
         
     today = datetime.now(UTC).date()
     
+    # Task: Check whether the user already submitted today's check-in
     existing_checkin = CheckIn.query.filter_by(user_id=current_user.id, date=today).first()
     
     if existing_checkin:
-        existing_checkin.mood_score = mood_score
-        existing_checkin.habits = habits
-        existing_checkin.note = note
-        print(f"DEBUG: Updated today's check-in for {current_user.email}", flush=True)
-    else:
-        new_checkin = CheckIn(
-            user_id=current_user.id,
-            mood_score=mood_score,
-            habits=habits,
-            note=note,
-            date=today
-        )
-        db.session.add(new_checkin)
-        print(f"DEBUG: Created new daily check-in for {current_user.email}", flush=True)
-        
+        # Goal: Prevent duplicate daily check-ins by blocking the submission
+        flash('You have already submitted your check-in for today!')
+        print(f"DEBUG: Blocked duplicate check-in attempt for {current_user.email}", flush=True)
+        return redirect(url_for('main.dashboard'))
+    
+    # If no existing check-in, create a new one
+    new_checkin = CheckIn(
+        user_id=current_user.id,
+        mood_score=mood_score,
+        habits=habits,
+        note=note,
+        date=today
+    )
+    db.session.add(new_checkin)
+    print(f"DEBUG: Created new daily check-in for {current_user.email}", flush=True)
+    
     db.session.commit()
     flash('Daily check-in saved successfully!')
     return redirect(url_for('main.dashboard'))
