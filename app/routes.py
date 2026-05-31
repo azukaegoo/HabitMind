@@ -43,19 +43,25 @@ def checkin():
         flash('Mood score is required!')
         return redirect(url_for('main.dashboard'))
         
+    try:
+        mood_score = int(mood_score)
+    except ValueError:
+        flash('Invalid mood score format!')
+        return redirect(url_for('main.dashboard'))
+        
     today = datetime.now(UTC).date()
     
     existing_checkin = CheckIn.query.filter_by(user_id=current_user.id, date=today).first()
     
     if existing_checkin:
-        existing_checkin.mood_score = int(mood_score)
+        existing_checkin.mood_score = mood_score
         existing_checkin.habits = habits
         existing_checkin.note = note
         print(f"DEBUG: Updated today's check-in for {current_user.email}", flush=True)
     else:
         new_checkin = CheckIn(
             user_id=current_user.id,
-            mood_score=int(mood_score),
+            mood_score=mood_score,
             habits=habits,
             note=note,
             date=today
