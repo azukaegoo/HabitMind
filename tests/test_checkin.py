@@ -215,3 +215,25 @@ def test_user_onboarding_choices(client, app, authenticated_user):
         
         assert user.selected_goals == "Improve mental focus"
         assert getattr(user, 'selected_habits', None) == "meditation, reading"
+
+def test_premium_restriction(client, app):
+    """Verify that only premium users can access premium routes."""
+    
+    # 1. Create a Premium User specifically for this test
+    with app.app_context():
+        premium_user = User(email="premium@test.com", plan="premium")
+        premium_user.set_password("password")
+        db.session.add(premium_user)
+        db.session.commit()
+        db.session.refresh(premium_user)
+        user_id = premium_user.id
+
+    # 2. Login as Premium User
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user_id)
+        sess['_fresh'] = True
+    
+    # 3. Premium User should succeed (200)
+    response = client.get('/premium-insights')
+    assert response.status_code == 200
+    assert b"Welcome to Premium Insights!" in response.data

@@ -12,6 +12,17 @@ from collections import Counter
 logger = logging.getLogger(__name__)
 main = Blueprint("main", __name__)
 
+def premium_required(f):
+    """Decorator to require premium plan for specific routes."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.plan != 'premium':
+            flash('This feature is for Premium users only!')
+            print(f"DEBUG: Blocked free user {current_user.email} from premium feature", flush=True)
+            return redirect(url_for('main.dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @main.route("/")
 def home():
     """Redirect to dashboard if logged in, otherwise to login page."""
@@ -163,3 +174,10 @@ def checkin():
     db.session.commit()
     flash('Daily check-in saved successfully!')
     return redirect(url_for('main.dashboard'))
+
+@main.route("/premium-insights")
+@login_required
+@premium_required
+def premium_insights():
+    """A premium-only feature for testing."""
+    return "Welcome to Premium Insights!"
