@@ -3,11 +3,12 @@ from functools import wraps
 from . import db
 from .models import CheckIn  
 import logging
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
 from sqlalchemy import func
 from itertools import combinations
 from collections import Counter
+from .models import User, CheckIn, WeeklyInsight
 
 logger = logging.getLogger(__name__)
 main = Blueprint("main", __name__)
@@ -181,3 +182,143 @@ def checkin():
 def premium_insights():
     """A premium-only feature for testing."""
     return "Welcome to Premium Insights!"
+
+@main.route("/insights", methods=['GET'])
+@login_required
+def view_insights():
+    """Goal: Users can view previous insight summaries."""
+    past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
+    return render_template("insights.html", insights=past_insights)
+
+@main.route("/insights/generate", methods=['POST'])
+@login_required
+def generate_insight():
+    """Task: Create weekly insight model and save summary, average mood, and top habits."""
+    today = datetime.now(UTC).date()
+    week_ago = today - timedelta(days=7)
+
+    recent_checkins = CheckIn.query.filter(
+        CheckIn.user_id == current_user.id,
+        CheckIn.date > week_ago,
+        CheckIn.date <= today
+    ).all()
+
+    if not recent_checkins:
+        flash("Not enough data to generate a weekly insight.")
+        return redirect(url_for('main.view_insights'))
+
+    total_mood = sum(c.mood_score for c in recent_checkins)
+    avg_mood = round(total_mood / len(recent_checkins), 1)
+
+    habit_list = []
+    for c in recent_checkins:
+        if c.habits:
+            habit_list.extend([h.strip() for h in c.habits.split(',') if h.strip()])
+
+    top_habits_str = ""
+    if habit_list:
+        most_common = Counter(habit_list).most_common(3)
+        top_habits_str = ", ".join([h[0] for h in most_common])
+
+    new_insight = WeeklyInsight(
+        user_id=current_user.id,
+        start_date=week_ago + timedelta(days=1),
+        end_date=today,
+        average_mood=avg_mood,
+        top_habits=top_habits_str,
+        summary=f"Your average mood was {avg_mood}. Great job focusing on {top_habits_str}!"
+    )
+
+    db.session.add(new_insight)
+    db.session.commit()
+    
+    flash("Weekly insight generated successfully!")
+    return redirect(url_for('main.view_insights'))
+
+@main.route("/profile", methods=['GET'])
+@login_required
+def profile():
+    """Goal: Provide user profile information."""
+    user_id = current_user.id
+    today = datetime.now(UTC).date()
+    
+    # 1. Total Check-ins
+    total_checkins = CheckIn.query.filter_by(user_id=user_id).count()
+    
+    # 2. Average Mood
+    avg_mood_result = db.session.query(func.avg(CheckIn.mood_score)).filter_by(user_id=user_id).scalar()
+    average_mood = round(avg_mood_result, 1) if avg_mood_result else 0.0
+    
+    # 3. Current Streak
+    checkins = CheckIn.query.filter_by(user_id=user_id).order_by(CheckIn.date.desc()).all()
+    current_streak = 0
+    if checkins:
+        first_date = checkins[0].date
+        if first_date == today or first_date == today - timedelta(days=1):
+            current_streak = 1
+            expected_date = first_date - timedelta(days=1)
+            for i in range(1, len(checkins)):
+                if checkins[i].date == expected_date:
+                    current_streak += 1
+                    expected_date -= timedelta(days=1)
+                else:
+                    break
+
+    return render_template(
+        "profile.html", 
+        user=current_user,
+        total_checkins=total_checkins,
+        average_mood=average_mood,
+        current_streak=current_streak
+    )
+
+@main.route("/settings", methods=['GET'])
+@login_required
+def settings():
+    """Goal: Allow users to view settings."""
+    return render_template("settings.html")
+
+@main.route("/settings/update", methods=['POST'])
+@login_required
+def update_settings():
+    """Task: Update account details and AI personalisation."""
+    new_email = request.form.get('email')
+    ai_consent = request.form.get('ai_consent') == 'on' 
+    
+    if new_email:
+        current_user.email = new_email
+    current_user.ai_consent = ai_consent
+    
+    db.session.commit()
+    flash("Settings updated successfully!")
+    return redirect(url_for('main.settings'))
+
+@main.route("/settings/cancel-premium", methods=['POST'])
+@login_required
+def cancel_premium():
+    """Task: Unsubscribe from premium."""
+    user = db.session.get(User, current_user.id)
+
+    if user.plan == 'premium':
+        user.plan = 'free'
+        db.session.commit()
+        flash("Your Premium subscription has been cancelled.")
+    
+    return redirect(url_for('main.settings'))
+    
+@main.route("/settings/delete-account", methods=['POST'])
+@login_required
+def delete_account():
+    """Task: Account deletion."""
+    user_id = current_user.id
+    
+    CheckIn.query.filter_by(user_id=user_id).delete()
+    WeeklyInsight.query.filter_by(user_id=user_id).delete()
+    
+    user_to_delete = db.session.get(User, user_id)
+    db.session.delete(user_to_delete)
+    db.session.commit()
+    
+    logout_user()
+    flash("Your account has been permanently deleted.")
+    return redirect(url_for('main.home'))

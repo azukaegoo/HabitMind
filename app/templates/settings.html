@@ -1,0 +1,17 @@
+<h1>Settings</h1>
+
+<form action="/settings/update" method="POST">
+    <label>Email:</label>
+    <input type="text" name="email" value="{{ current_user.email }}">
+    <label>AI Personalization:</label>
+    <input type="checkbox" name="ai_consent" {% if current_user.ai_consent %}checked{% endif %}>
+    <button type="submit">Save Changes</button>
+</form>
+
+<form action="/settings/cancel-premium" method="POST">
+    <button type="submit">Cancel Premium Subscription</button>
+</form>
+
+<form action="/settings/delete-account" method="POST">
+    <button type="submit" style="color: red;">Delete Account</button>
+</form>

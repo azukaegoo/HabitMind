@@ -4,6 +4,7 @@ from datetime import datetime, UTC
 # Import from the 'app' package based on your directory structure
 from app import create_app, db
 from app.models import User, CheckIn
+from app.models import User, CheckIn, WeeklyInsight
 
 @pytest.fixture
 def app():
@@ -237,3 +238,124 @@ def test_premium_restriction(client, app):
     response = client.get('/premium-insights')
     assert response.status_code == 200
     assert b"Welcome to Premium Insights!" in response.data
+
+def test_weekly_insight_generation_and_view(client, app, authenticated_user):
+    """Verify that a weekly insight can be generated and viewed."""
+    
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+
+    with app.app_context():
+        today = datetime.now(UTC).date()
+        db.session.add(CheckIn(user_id=authenticated_user.id, mood_score=5, habits="reading, exercise", date=today))
+        db.session.add(CheckIn(user_id=authenticated_user.id, mood_score=4, habits="exercise, coding", date=today - timedelta(days=1)))
+        db.session.add(CheckIn(user_id=authenticated_user.id, mood_score=3, habits="reading", date=today - timedelta(days=2)))
+        db.session.commit()
+
+    response_post = client.post('/insights/generate', follow_redirects=True)
+    assert response_post.status_code == 200
+
+    with app.app_context():
+        insights = WeeklyInsight.query.filter_by(user_id=authenticated_user.id).all()
+        assert len(insights) == 1
+        assert insights[0].average_mood == 4.0  # (5 + 4 + 3) / 3 = 4.0
+        assert "exercise" in insights[0].top_habits or "reading" in insights[0].top_habits
+
+    response_get = client.get('/insights')
+    assert response_get.status_code == 200
+
+def test_user_profile_view(client, app, authenticated_user):
+    """Verify that the profile page displays correctly with user data."""
+    
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+
+    # Add dummy data to calculate stats
+    with app.app_context():
+        today = datetime.now(UTC).date()
+        db.session.add(CheckIn(user_id=authenticated_user.id, mood_score=4, habits="coding", date=today))
+        db.session.add(CheckIn(user_id=authenticated_user.id, mood_score=5, habits="reading", date=today - timedelta(days=1)))
+        
+        # Set a goal to test goal display
+        user = db.session.get(User, authenticated_user.id)
+        user.selected_goals = "Master Backend"
+        db.session.commit()
+
+    # Request the profile page
+    response = client.get('/profile')
+    assert response.status_code == 200
+    
+    # Verify the specific user data is in the HTML output
+    response_text = response.data.decode('utf-8')
+    assert authenticated_user.email in response_text
+    assert "Master Backend" in response_text
+    assert "Average Mood: 4.5" in response_text
+    assert "Current Streak: 2" in response_text
+
+def test_user_settings_routes(client, app):
+    """Verify update settings, cancel premium, and account deletion work."""
+    
+    with app.app_context():
+        test_user = User(email="settings@test.com", plan="premium")
+        test_user.set_password("password") 
+        db.session.add(test_user)
+        db.session.commit()
+        db.session.refresh(test_user)
+        user_id = test_user.id
+
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user_id)
+        sess['_fresh'] = True
+
+    response_update = client.post('/settings/update', data={'email': 'updated@test.com'}, follow_redirects=True)
+    assert response_update.status_code == 200
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        assert user.email == 'updated@test.com'
+        assert user.ai_consent is False
+        
+    response_cancel = client.post('/settings/cancel-premium', follow_redirects=True)
+    assert response_cancel.status_code == 200
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        assert user.plan == 'free'
+        
+    response_delete = client.post('/settings/delete-account', follow_redirects=True)
+    assert response_delete.status_code == 200
+    with app.app_context():
+        deleted_user = db.session.get(User, user_id)
+        assert deleted_user is None
+
+def test_user_registration(client, app):
+    """Verify that a new user can register successfully."""
+    response = client.post('/register', data={
+        'email': 'new_user@test.com',
+        'password': 'password123',
+        'confirm_password': 'password123'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    with app.app_context():
+        user = User.query.filter_by(email='new_user@test.com').first()
+        assert user is not None
+        assert user.email == 'new_user@test.com'
+
+def test_user_login(client, app):
+    """Verify that an existing user can log in."""
+    with app.app_context():
+        test_user = User(email="login_test@test.com")
+        test_user.set_password("password123")
+        db.session.add(test_user)
+        db.session.commit()
+        
+    response = client.post('/login', data={
+        'email': 'login_test@test.com',
+        'password': 'password123'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    assert response.request.path == '/dashboard'
