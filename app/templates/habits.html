@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitMind - Choose Your Habits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%);">
+
+    <!-- Ambient glow blobs -->
+    <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20" style="background: radial-gradient(ellipse, #34d399 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute bottom-0 -right-40 w-[500px] h-[500px] rounded-full opacity-10" style="background: radial-gradient(ellipse, #10b981 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute top-1/2 -left-32 w-[400px] h-[400px] rounded-full opacity-10" style="background: radial-gradient(ellipse, #059669 0%, transparent 70%);"></div>
+
+    <!-- Subtle grid overlay -->
+    <div class="pointer-events-none absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 64px 64px;"></div>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+      <!-- Header -->
+      <header class="px-6 pt-6 pb-2 flex items-center justify-between max-w-5xl mx-auto w-full">
+        <a href="/" class="flex items-center gap-3 no-underline">
+          <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+              <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+              <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+              <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+              <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>
+              <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+              <path d="M19.938 10.5a4 4 0 0 1 .585.396"/>
+              <path d="M6 18a4 4 0 0 1-1.967-.516"/>
+              <path d="M19.967 17.484A4 4 0 0 1 18 18"/>
+            </svg>
+          </div>
+          <span class="text-white font-bold text-lg tracking-tight">HabitMind</span>
+        </a>
+        <a href="/goals" class="text-emerald-300 hover:text-white text-sm font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/10">
+          Back
+        </a>
+      </header>
+
+      <!-- Selection Counter Badge (Floating) -->
+      <div class="fixed top-24 right-6 z-20">
+        <div class="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+          <p class="text-emerald-300 text-sm font-bold">
+            <span id="counterDisplay">0 / 7</span> selected
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col items-center px-4 py-8 md:py-12 pb-32">
+        <div class="w-full max-w-5xl mx-auto">
+
+          <!-- Progress Indicator -->
+          <div class="mb-10 text-center">
+            <p class="text-emerald-300/70 text-sm font-medium mb-4">Step 2 of 3</p>
+            <div class="flex gap-2 justify-center">
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+              <div class="h-1.5 w-16 rounded-full bg-white/20"></div>
+            </div>
+          </div>
+
+          <!-- Heading -->
+          <div class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+              Which habits matter to you?
+            </h1>
+            <p class="text-emerald-100/70 text-base">
+              Pick 5 to 7 habits — these are scientifically proven to support well-being
+            </p>
+          </div>
+
+          <!-- Habit Form -->
+          <form id="habitForm" action="/habits" method="POST" class="space-y-10">
+
+            <!-- Hidden input -->
+            <input type="hidden" name="habits" id="habitsInput" value="">
+
+            <!-- Category 1: Physical -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(16, 185, 129, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m18.376 12.916-3.5-3.5a1.873 1.873 0 0 0-2.652 0l-2.5 2.5a1.873 1.873 0 0 0 0 2.652l3.5 3.5a1.873 1.873 0 0 0 2.652 0l2.5-2.5a1.873 1.873 0 0 0 0-2.652Z"></path>
+                    <path d="M8 22s-1-2-3-2-3 1-3 1"></path>
+                    <path d="M4 14h-.5a2.5 2.5 0 0 1 0-5H4"></path>
+                    <path d="M20 14h.5a2.5 2.5 0 0 0 0-5H20"></path>
+                  </svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Physical</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #10b981, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'exercise-30')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(16, 185, 129, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"></path><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"></path><path d="m21.5 21.5-1.4-1.4"></path><path d="M3.9 3.9 2.5 2.5"></path><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Exercise 30 min</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'walk-8k')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(16, 185, 129, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path><circle cx="12" cy="5" r="2"></circle></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Walk 8k+ steps</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'stretch-yoga')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(16, 185, 129, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"></circle><path d="m9 20 3-6 3 6"></path><path d="m6 8 6 2 6-2"></path><path d="M12 10v4"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Stretch or yoga</h3>
+                </button>
+              </div>
+            </section>
+
+            <!-- Category 2: Sleep -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(14, 165, 233, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Sleep</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #0ea5e9, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'sleep-7h')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(14, 165, 233, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h1"></path><path d="M9 4v1"></path><path d="M9 19v1"></path><path d="M20 12h1"></path><path d="m4.64 16.36.7-.7"></path><path d="m4.64 7.64.7.7"></path><path d="m9 9 3 3"></path><circle cx="12" cy="12" r="5"></circle></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Sleep 7+ hours</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'bedtime')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(14, 165, 233, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Consistent bedtime</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'no-screens')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(14, 165, 233, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><path d="M2 21 22 3"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">No screens before bed</h3>
+                </button>
+              </div>
+            </section>
+
+            <!-- Category 3: Nutrition -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(245, 158, 11, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Nutrition</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #f59e0b, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'water-2l')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(245, 158, 11, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 22a5 5 0 0 1-2-4"></path><path d="M7 16.93c.96.43 1.96.74 2.99.91"></path><path d="M3.34 14A6.8 6.8 0 0 1 2 10c0-4.42 4.48-8 10-8s10 3.58 10 8a7.19 7.19 0 0 1-.33 2"></path><path d="M5 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Drink 2L water</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'fruits-veggies')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(245, 158, 11, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14s-5 4-2 10"></path><path d="M16 14s5 4 2 10"></path><path d="M12 16c0-1.7.5-3.2 1.5-4.5"></path><path d="M4.26 11.5A8 8 0 1 0 17 8"></path><path d="m8 10-1.5-1.5"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Eat fruits or vegetables</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'no-junk')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(245, 158, 11, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.9 4.9 14.2 14.2"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">No junk food</h3>
+                </button>
+              </div>
+            </section>
+
+            <!-- Category 4: Mental -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(139, 92, 246, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path></svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Mental</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #8b5cf6, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'meditation')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(139, 92, 246, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Meditation or breathing</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'journaling')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(139, 92, 246, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path><path d="M9 10h6"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Journaling</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'outdoors')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(139, 92, 246, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12s2.545-5 7-5c4.454 0 7 5 7 5s-2.546 5-7 5c-4.455 0-7-5-7-5z"></path><path d="M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"></path><path d="M21 17v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2"></path><path d="M21 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Time outdoors</h3>
+                </button>
+              </div>
+            </section>
+
+            <!-- Category 5: Social -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(236, 72, 153, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Social</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #ec4899, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'connect')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(236, 72, 153, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><circle cx="12" cy="10" r="2"></circle><line x1="8" x2="8" y1="2" y2="4"></line><line x1="16" x2="16" y1="2" y2="4"></line></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Connect with someone</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'limit-social')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(236, 72, 153, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path><path d="M2 20 22 4"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Limit social media</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'help')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(236, 72, 153, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Help someone</h3>
+                </button>
+              </div>
+            </section>
+
+            <!-- Category 6: Growth -->
+            <section>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: rgba(20, 184, 166, 0.2);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                </div>
+                <h2 class="text-white font-bold text-lg">Growth</h2>
+                <div class="h-px flex-1 opacity-30" style="background: linear-gradient(to right, #14b8a6, transparent);"></div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button type="button" onclick="toggleHabit(this, 'read')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(20, 184, 166, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Read 20 minutes</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'learn')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(20, 184, 166, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"></path><path d="M6 6v11"></path><path d="M10 3v18"></path><path d="M14 8v7"></path><path d="M18 5v13"></path><path d="M22 10v3"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Learn something new</h3>
+                </button>
+
+                <button type="button" onclick="toggleHabit(this, 'gratitude')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                  <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center" style="background-color: rgba(20, 184, 166, 0.15);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M8 22h8"></path><path d="M9 2h6"></path><circle cx="12" cy="10" r="4"></circle></svg>
+                  </div>
+                  <h3 class="text-white font-bold text-base">Practice gratitude</h3>
+                </button>
+              </div>
+            </section>
+
+          </form>
+
+          <!-- Max selection message -->
+          <div id="maxMessage" class="text-center mb-6 hidden">
+            <p class="text-amber-300 text-sm font-medium">You've reached the maximum of 7 habits</p>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Sticky Continue Button -->
+      <div class="fixed bottom-0 left-0 right-0 p-6 z-30" style="background: linear-gradient(to top, #022c22 0%, #022c22 60%, transparent 100%);">
+        <div class="max-w-5xl mx-auto">
+          <button type="button" id="continueBtn" onclick="handleContinue()" disabled class="w-full py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center justify-center gap-2 bg-white/10 text-white/30 cursor-not-allowed border border-white/10">
+            Continue
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" x2="19" y1="12" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedHabits = [];
+    const minHabits = 5;
+    const maxHabits = 7;
+
+    function toggleHabit(button, habitId) {
+      const checkmark = button.querySelector('.checkmark');
+      const isSelected = selectedHabits.includes(habitId);
+
+      if (isSelected) {
+        selectedHabits = selectedHabits.filter(id => id !== habitId);
+        button.classList.remove('bg-white/10', 'border-emerald-400', 'shadow-lg', 'shadow-emerald-400/20');
+        button.classList.add('bg-white/5', 'border-white/10');
+        checkmark.classList.add('hidden');
+        checkmark.classList.remove('flex');
+        document.getElementById('maxMessage').classList.add('hidden');
+      } else {
+        if (selectedHabits.length >= maxHabits) {
+          const maxMsg = document.getElementById('maxMessage');
+          maxMsg.classList.remove('hidden');
+          setTimeout(() => { maxMsg.classList.add('hidden'); }, 2000);
+          return;
+        }
+        selectedHabits.push(habitId);
+        button.classList.remove('bg-white/5', 'border-white/10');
+        button.classList.add('bg-white/10', 'border-emerald-400', 'shadow-lg', 'shadow-emerald-400/20');
+        checkmark.classList.remove('hidden');
+        checkmark.classList.add('flex');
+      }
+
+      // Keep hidden input in sync
+      document.getElementById('habitsInput').value = selectedHabits.join(',');
+      updateCounter();
+      updateContinueButton();
+    }
+
+    function updateCounter() {
+      document.getElementById('counterDisplay').textContent = `${selectedHabits.length} / ${maxHabits}`;
+    }
+
+    function updateContinueButton() {
+      const continueBtn = document.getElementById('continueBtn');
+      if (selectedHabits.length >= minHabits) {
+        continueBtn.disabled = false;
+        continueBtn.classList.remove('bg-white/10', 'text-white/30', 'cursor-not-allowed', 'border', 'border-white/10');
+        continueBtn.classList.add('text-emerald-900', 'shadow-xl', 'hover:shadow-2xl', 'hover:shadow-emerald-400/20', 'hover:scale-[1.02]', 'active:scale-[0.98]');
+        continueBtn.style.background = 'linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%)';
+      } else {
+        continueBtn.disabled = true;
+        continueBtn.classList.add('bg-white/10', 'text-white/30', 'cursor-not-allowed', 'border', 'border-white/10');
+        continueBtn.classList.remove('text-emerald-900', 'shadow-xl', 'hover:shadow-2xl', 'hover:shadow-emerald-400/20', 'hover:scale-[1.02]', 'active:scale-[0.98]');
+        continueBtn.style.background = '';
+      }
+    }
+
+    function handleContinue() {
+      if (selectedHabits.length >= minHabits && selectedHabits.length <= maxHabits) {
+        document.getElementById('habitForm').submit();
+      }
+    }
+  </script>
+
+</body>
+</html>

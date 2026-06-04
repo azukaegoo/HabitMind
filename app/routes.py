@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from functools import wraps
 from . import db
-from .models import CheckIn  
 import logging
 from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
@@ -24,6 +23,9 @@ def premium_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ═══════════════════════════════════════════
+# HOME
+# ═══════════════════════════════════════════
 @main.route("/")
 def home():
     """Redirect to dashboard if logged in, otherwise to login page."""
@@ -68,7 +70,7 @@ def dashboard():
     # 5. Calculate Habit-Mood Insights
     all_checkins = CheckIn.query.filter_by(user_id=user_id).all()
     habit_stats = {}
-    
+
     for checkin in all_checkins:
         if checkin.habits:
             habits_list = [h.strip() for h in checkin.habits.split(',') if h.strip()]
@@ -77,12 +79,12 @@ def dashboard():
                     habit_stats[habit] = {"total_mood": 0, "count": 0}
                 habit_stats[habit]["total_mood"] += checkin.mood_score
                 habit_stats[habit]["count"] += 1
-                
+
     ranked_habits = []
     for habit, stats in habit_stats.items():
         avg = stats["total_mood"] / stats["count"]
         ranked_habits.append({"habit": habit, "average_mood": round(avg, 2)})
-        
+
     ranked_habits.sort(key=lambda x: x["average_mood"], reverse=True)
 
     # 6. Find Common Habit Combinations on High-Mood Days (Mood >= 4)
@@ -96,15 +98,17 @@ def dashboard():
                 # Generate all possible pairs of habits from this check-in
                 pairs = list(combinations(habits_list, 2))
                 habit_pairs.extend(pairs)
-                
+
     # Count the frequencies of each pair and get the top 3
     pair_counts = Counter(habit_pairs)
     top_combinations = [{"pair": " + ".join(pair), "count": count} for pair, count in pair_counts.most_common(3)]
-                    
-    print(f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}", flush=True)
+
+    print(
+        f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}",
+        flush=True)
 
     return render_template(
-        "home.html", 
+        "home.html",
         has_checked_in_today=has_checked_in_today,
         total_checkins=total_checkins,
         average_mood=average_mood,
@@ -113,6 +117,10 @@ def dashboard():
         top_combinations=top_combinations
     )
 
+
+# ═══════════════════════════════════════════
+# ONBOARDING
+# ═══════════════════════════════════════════
 @main.route("/goals", methods=['GET', 'POST'])
 @login_required
 def goals():
@@ -121,7 +129,7 @@ def goals():
         # Task: Store selected habits and optional user goal
         selected_habits = request.form.get('habits')
         main_goal = request.form.get('goal')
-        
+
         # Save to the current user's profile
         if selected_habits:
             current_user.selected_habits = selected_habits
@@ -133,9 +141,7 @@ def goals():
         
         flash('Onboarding complete! Welcome to your dashboard.')
         return redirect(url_for('main.dashboard'))
-        
-    # Goal: GET displays the onboarding form
-    return render_template("goals.html")
+
 
 @main.route("/checkin", methods=['GET', 'POST'])
 @login_required
@@ -146,24 +152,25 @@ def checkin():
     if request.method == 'GET':
         return render_template("checkin.html", existing_checkin=existing_checkin)
 
+
     mood_score = request.form.get('mood_score') 
     habits = request.form.get('habits')         
-    note = request.form.get('note')             
-    
+    note = request.form.get('note')
+
     if not mood_score:
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
-        
+
     try:
         mood_score = int(mood_score)
     except ValueError:
         flash('Invalid mood score format!')
         return redirect(url_for('main.checkin'))
-        
+
     if existing_checkin:
         flash('You have already submitted your check-in for today!')
         return redirect(url_for('main.dashboard'))
-    
+
     new_checkin = CheckIn(
         user_id=current_user.id,
         mood_score=mood_score,
@@ -176,6 +183,13 @@ def checkin():
     flash('Daily check-in saved successfully!')
     return redirect(url_for('main.dashboard'))
 
+
+
+
+
+# ═══════════════════════════════════════════
+# PREMIUM
+# ═══════════════════════════════════════════
 @main.route("/premium-insights")
 @login_required
 @premium_required
@@ -183,12 +197,16 @@ def premium_insights():
     """A premium-only feature for testing."""
     return "Welcome to Premium Insights!"
 
+# ═══════════════════════════════════════════
+# INSIGHTS
+# ═══════════════════════════════════════════
 @main.route("/insights", methods=['GET'])
 @login_required
 def view_insights():
     """Goal: Users can view previous insight summaries."""
     past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
     return render_template("insights.html", insights=past_insights)
+
 
 @main.route("/insights/generate", methods=['POST'])
 @login_required
@@ -235,6 +253,9 @@ def generate_insight():
     flash("Weekly insight generated successfully!")
     return redirect(url_for('main.view_insights'))
 
+# ═══════════════════════════════════════════
+# PROFILE
+# ═══════════════════════════════════════════
 @main.route("/profile", methods=['GET'])
 @login_required
 def profile():
@@ -269,6 +290,9 @@ def profile():
         streak=streak  
     )
 
+# ═══════════════════════════════════════════
+# SETTINGS
+# ═══════════════════════════════════════════
 @main.route("/settings", methods=['GET'])
 @login_required
 def settings():
@@ -297,23 +321,26 @@ def cancel_premium():
     if user.plan == 'premium':
         user.plan = 'free'
         db.session.commit()
+
         flash("Your Premium subscription has been cancelled.")
     
     return redirect(url_for('main.settings'))
-    
+
+
 @main.route("/settings/delete-account", methods=['POST'])
 @login_required
 def delete_account():
     """Task: Account deletion."""
     user_id = current_user.id
-    
+
     CheckIn.query.filter_by(user_id=user_id).delete()
     WeeklyInsight.query.filter_by(user_id=user_id).delete()
-    
+
     user_to_delete = db.session.get(User, user_id)
     db.session.delete(user_to_delete)
     db.session.commit()
-    
+
     logout_user()
     flash("Your account has been permanently deleted.")
     return redirect(url_for('main.home'))
+
