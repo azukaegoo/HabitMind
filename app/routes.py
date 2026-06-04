@@ -144,43 +144,8 @@ def goals():
         
         flash('Onboarding complete! Welcome to your dashboard.')
         return redirect(url_for('main.dashboard'))
-        
-
-@main.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        # backend: verify user credentials
-        return redirect(url_for("main.dashboard"))
-    return render_template("login.html")
 
 
-@main.route("/forgot-password", methods=["GET", "POST"])
-def forgot_password():
-    if request.method == "POST":
-        # Backend will handle email sending later
-        return redirect(url_for("main.check_email"))
-    return render_template("forgot_password.html")
-
-
-@main.route("/check-email")
-def check_email():
-    return render_template("check_email.html")
-
-
-# ═══════════════════════════════════════════
-# ONBOARDING (goals → habits → complete)
-# ═══════════════════════════════════════════
-@main.route("/goals", methods=["GET", "POST"])
-def goals():
-    if request.method == "POST":
-        selected_goals = request.form.get("goals")
-        # backend: save the goals to database
-        return redirect(url_for("main.habits"))
-
-
-# ═══════════════════════════════════════════
-# CHECK-IN
-# ═══════════════════════════════════════════
 @main.route("/checkin", methods=['GET', 'POST'])
 @login_required
 def checkin():
@@ -198,44 +163,6 @@ def checkin():
     if not mood_score:
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
-        
-
-@main.route("/habits", methods=["GET", "POST"])
-def habits():
-    if request.method == "POST":
-        selected_habits = request.form.get("habits")
-        # backend: save the habits to database
-        return redirect(url_for("main.complete"))
-    return render_template("habits.html")
-
-
-@main.route("/complete")
-def complete():
-    return render_template("onboarding_complete.html")
-
-
-# ═══════════════════════════════════════════
-# DASHBOARD & CHECK-IN
-# ═══════════════════════════════════════════
-@main.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html")
-
-
-@main.route("/check-in", methods=["GET", "POST"])
-def check_in():
-    if request.method == "POST":
-        mood = request.form.get("mood")
-        habits_done = request.form.get("habits_done")
-        # backend: save check-in to database
-        return redirect(url_for("main.check_in_complete"))
-    # For now, no habits passed (backend will add them)
-    return render_template("check_in.html", habits=[])
-
-
-@main.route("/check-in-complete")
-def check_in_complete():
-    return render_template("check_in_complete.html")
 
 
 
@@ -260,12 +187,6 @@ def view_insights():
     past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
     return render_template("insights.html", insights=past_insights)
 
-@main.route("/insights/history", methods=['GET'])
-@login_required
-def insights_history():
-    """List of past insight reports for the user."""
-    past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
-    return render_template("insight_history.html", records=past_insights, selected_period="1m")
 
 @main.route("/insights/generate", methods=['POST'])
 @login_required
@@ -384,42 +305,22 @@ def cancel_premium():
         flash("Your Premium subscription has been cancelled.")
     
     return redirect(url_for('main.settings'))
-    
+
+
 @main.route("/settings/delete-account", methods=['POST'])
 @login_required
 def delete_account():
     """Task: Account deletion."""
     user_id = current_user.id
-    
+
     CheckIn.query.filter_by(user_id=user_id).delete()
     WeeklyInsight.query.filter_by(user_id=user_id).delete()
-    
+
     user_to_delete = db.session.get(User, user_id)
     db.session.delete(user_to_delete)
     db.session.commit()
-    
+
     logout_user()
     flash("Your account has been permanently deleted.")
-    return redirect(url_for('main.home'))
-
-    flash("Button click saved successfully.")
-    except Exception as e:(
-        db.session.rollback())
-        logger.exception("Database error while saving button click: %s", e)
-        flash("Could not save button click.")
-    return redirect(url_for("main.home"))
-
-
-@main.route("/insights/history")
-def insights_history():
-    # backend: fetch user's past insight records
-    # Each record needs: id, date_range, days
-    return render_template("insight_history.html", records=[], selected_period="1m")
-
-@main.route("/insights")
-def insights():
-    return render_template("insights.html")
-
-
     return redirect(url_for('main.home'))
 
