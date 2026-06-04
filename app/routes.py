@@ -67,10 +67,6 @@ def dashboard():
                 else:
                     break
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     # 5. Calculate Habit-Mood Insights
     all_checkins = CheckIn.query.filter_by(user_id=user_id).all()
     habit_stats = {}
@@ -90,8 +86,7 @@ def dashboard():
         ranked_habits.append({"habit": habit, "average_mood": round(avg, 2)})
         
     ranked_habits.sort(key=lambda x: x["average_mood"], reverse=True)
-<<<<<<< HEAD
-=======
+
 # ═══════════════════════════════════════════
 # AUTH (signup, login, forgot password)
 # ═══════════════════════════════════════════
@@ -101,9 +96,7 @@ def signup():
         # backend: create user account
         return redirect(url_for("main.goals"))
     return render_template("signup.html")
->>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
+
 
     # 6. Find Common Habit Combinations on High-Mood Days (Mood >= 4)
     habit_pairs = []
@@ -119,10 +112,7 @@ def signup():
                     
     print(f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}", flush=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
+
     return render_template(
         "home.html", 
         has_checked_in_today=has_checked_in_today,
@@ -155,9 +145,7 @@ def goals():
         flash('Onboarding complete! Welcome to your dashboard.')
         return redirect(url_for('main.dashboard'))
         
-<<<<<<< HEAD
-    # Goal: GET displays the onboarding form
-=======
+
 @main.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -188,10 +176,7 @@ def goals():
         selected_goals = request.form.get("goals")
         # backend: save the goals to database
         return redirect(url_for("main.habits"))
->>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
-    return render_template("goals.html")
+
 
 # ═══════════════════════════════════════════
 # CHECK-IN
@@ -205,10 +190,7 @@ def checkin():
     if request.method == 'GET':
         return render_template("checkin.html", existing_checkin=existing_checkin)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
+
     mood_score = request.form.get('mood_score') 
     habits = request.form.get('habits')         
     note = request.form.get('note')             
@@ -217,8 +199,7 @@ def checkin():
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
         
-<<<<<<< HEAD
-=======
+
 @main.route("/habits", methods=["GET", "POST"])
 def habits():
     if request.method == "POST":
@@ -257,35 +238,7 @@ def check_in_complete():
     return render_template("check_in_complete.html")
 
 
-# ═══════════════════════════════════════════
-# ONE BUTTON APP (demo)
-# ═══════════════════════════════════════════
-@main.route("/submit", methods=["POST"])
-def submit():
->>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
-    try:
-        mood_score = int(mood_score)
-    except ValueError:
-        flash('Invalid mood score format!')
-        return redirect(url_for('main.checkin'))
-        
-    if existing_checkin:
-        flash('You have already submitted your check-in for today!')
-        return redirect(url_for('main.dashboard'))
-    
-    new_checkin = CheckIn(
-        user_id=current_user.id,
-        mood_score=mood_score,
-        habits=habits,
-        note=note,
-        date=today
-    )
-    db.session.add(new_checkin)
-    db.session.commit()
-    flash('Daily check-in saved successfully!')
-    return redirect(url_for('main.dashboard'))
+
 
 # ═══════════════════════════════════════════
 # PREMIUM
@@ -427,10 +380,7 @@ def cancel_premium():
     if user.plan == 'premium':
         user.plan = 'free'
         db.session.commit()
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
+
         flash("Your Premium subscription has been cancelled.")
     
     return redirect(url_for('main.settings'))
@@ -450,12 +400,11 @@ def delete_account():
     
     logout_user()
     flash("Your account has been permanently deleted.")
-<<<<<<< HEAD
     return redirect(url_for('main.home'))
-=======
-        flash("Button click saved successfully.")
-    except Exception as e:
-        db.session.rollback()
+
+    flash("Button click saved successfully.")
+    except Exception as e:(
+        db.session.rollback())
         logger.exception("Database error while saving button click: %s", e)
         flash("Could not save button click.")
     return redirect(url_for("main.home"))
@@ -470,7 +419,7 @@ def insights_history():
 @main.route("/insights")
 def insights():
     return render_template("insights.html")
->>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
-=======
+
+
     return redirect(url_for('main.home'))
->>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
+
