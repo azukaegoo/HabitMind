@@ -1,0 +1,31 @@
+import pytest
+from datetime import datetime, UTC, timedelta
+from app.models import User, CheckIn, WeeklyInsight
+from app import db
+
+@pytest.mark.skip(reason="Waiting for Safrin's frontend templates")
+def test_checkin_get_route(client, app, authenticated_user):
+    """Test the GET route for rendering the form and completed states."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+    response_initial = client.get('/checkin')
+    assert response_initial.status_code == 200
+
+def test_checkin_integration_flow(client, app, authenticated_user):
+    """Test the daily check-in creation and update flow."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+    form_data = {"mood_score": "4", "habits": "exercise, reading", "note": "Studied hard today!"}
+    response = client.post('/checkin', data=form_data, follow_redirects=True)
+    assert response.status_code == 200
+
+@pytest.mark.skip(reason="Waiting for Safrin's frontend templates")
+def test_weekly_insight_generation_and_view(client, app, authenticated_user):
+    """Verify that a weekly insight can be generated and viewed."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+    response_post = client.post('/insights/generate', follow_redirects=True)
+    assert response_post.status_code == 200
