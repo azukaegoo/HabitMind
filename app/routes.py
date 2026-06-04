@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from functools import wraps
 from . import db
-from .models import CheckIn  
 import logging
 from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
@@ -69,6 +68,9 @@ def dashboard():
                     break
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     # 5. Calculate Habit-Mood Insights
     all_checkins = CheckIn.query.filter_by(user_id=user_id).all()
     habit_stats = {}
@@ -88,6 +90,7 @@ def dashboard():
         ranked_habits.append({"habit": habit, "average_mood": round(avg, 2)})
         
     ranked_habits.sort(key=lambda x: x["average_mood"], reverse=True)
+<<<<<<< HEAD
 =======
 # ═══════════════════════════════════════════
 # AUTH (signup, login, forgot password)
@@ -99,26 +102,27 @@ def signup():
         return redirect(url_for("main.goals"))
     return render_template("signup.html")
 >>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
 
     # 6. Find Common Habit Combinations on High-Mood Days (Mood >= 4)
-    # Goal: Identify which habits frequently appear together when the user is happy
     habit_pairs = []
     for checkin in all_checkins:
         if checkin.mood_score >= 4 and checkin.habits:
-            # Clean and sort so ('A', 'B') is treated the same as ('B', 'A')
             habits_list = sorted([h.strip() for h in checkin.habits.split(',') if h.strip()])
             if len(habits_list) >= 2:
-                # Generate all possible pairs of habits from this check-in
                 pairs = list(combinations(habits_list, 2))
                 habit_pairs.extend(pairs)
                 
-    # Count the frequencies of each pair and get the top 3
     pair_counts = Counter(habit_pairs)
     top_combinations = [{"pair": " + ".join(pair), "count": count} for pair, count in pair_counts.most_common(3)]
                     
     print(f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}", flush=True)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     return render_template(
         "home.html", 
         has_checked_in_today=has_checked_in_today,
@@ -129,16 +133,17 @@ def signup():
         top_combinations=top_combinations
     )
 
+# ═══════════════════════════════════════════
+# ONBOARDING
+# ═══════════════════════════════════════════
 @main.route("/goals", methods=['GET', 'POST'])
 @login_required
 def goals():
     """Handle user onboarding: Save selected habits and optional user goal."""
     if request.method == 'POST':
-        # Task: Store selected habits and optional user goal
         selected_habits = request.form.get('habits')
         main_goal = request.form.get('goal')
         
-        # Save to the current user's profile
         if selected_habits:
             current_user.selected_habits = selected_habits
         if main_goal:
@@ -150,6 +155,7 @@ def goals():
         flash('Onboarding complete! Welcome to your dashboard.')
         return redirect(url_for('main.dashboard'))
         
+<<<<<<< HEAD
     # Goal: GET displays the onboarding form
 =======
 @main.route("/login", methods=["GET", "POST"])
@@ -183,8 +189,13 @@ def goals():
         # backend: save the goals to database
         return redirect(url_for("main.habits"))
 >>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     return render_template("goals.html")
 
+# ═══════════════════════════════════════════
+# CHECK-IN
+# ═══════════════════════════════════════════
 @main.route("/checkin", methods=['GET', 'POST'])
 @login_required
 def checkin():
@@ -195,6 +206,9 @@ def checkin():
         return render_template("checkin.html", existing_checkin=existing_checkin)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     mood_score = request.form.get('mood_score') 
     habits = request.form.get('habits')         
     note = request.form.get('note')             
@@ -203,6 +217,7 @@ def checkin():
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
         
+<<<<<<< HEAD
 =======
 @main.route("/habits", methods=["GET", "POST"])
 def habits():
@@ -248,6 +263,8 @@ def check_in_complete():
 @main.route("/submit", methods=["POST"])
 def submit():
 >>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
     try:
         mood_score = int(mood_score)
     except ValueError:
@@ -270,6 +287,9 @@ def submit():
     flash('Daily check-in saved successfully!')
     return redirect(url_for('main.dashboard'))
 
+# ═══════════════════════════════════════════
+# PREMIUM
+# ═══════════════════════════════════════════
 @main.route("/premium-insights")
 @login_required
 @premium_required
@@ -277,12 +297,22 @@ def premium_insights():
     """A premium-only feature for testing."""
     return "Welcome to Premium Insights!"
 
+# ═══════════════════════════════════════════
+# INSIGHTS
+# ═══════════════════════════════════════════
 @main.route("/insights", methods=['GET'])
 @login_required
 def view_insights():
     """Goal: Users can view previous insight summaries."""
     past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
     return render_template("insights.html", insights=past_insights)
+
+@main.route("/insights/history", methods=['GET'])
+@login_required
+def insights_history():
+    """List of past insight reports for the user."""
+    past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
+    return render_template("insight_history.html", records=past_insights, selected_period="1m")
 
 @main.route("/insights/generate", methods=['POST'])
 @login_required
@@ -329,6 +359,9 @@ def generate_insight():
     flash("Weekly insight generated successfully!")
     return redirect(url_for('main.view_insights'))
 
+# ═══════════════════════════════════════════
+# PROFILE
+# ═══════════════════════════════════════════
 @main.route("/profile", methods=['GET'])
 @login_required
 def profile():
@@ -363,6 +396,9 @@ def profile():
         streak=streak  
     )
 
+# ═══════════════════════════════════════════
+# SETTINGS
+# ═══════════════════════════════════════════
 @main.route("/settings", methods=['GET'])
 @login_required
 def settings():
@@ -392,6 +428,9 @@ def cancel_premium():
         user.plan = 'free'
         db.session.commit()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
         flash("Your Premium subscription has been cancelled.")
     
     return redirect(url_for('main.settings'))
@@ -411,6 +450,7 @@ def delete_account():
     
     logout_user()
     flash("Your account has been permanently deleted.")
+<<<<<<< HEAD
     return redirect(url_for('main.home'))
 =======
         flash("Button click saved successfully.")
@@ -431,3 +471,6 @@ def insights_history():
 def insights():
     return render_template("insights.html")
 >>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
+=======
+    return redirect(url_for('main.home'))
+>>>>>>> c51cc1d9533f32eb08b84807348ae0b1bc0291ac
