@@ -70,7 +70,7 @@ def dashboard():
     # 5. Calculate Habit-Mood Insights
     all_checkins = CheckIn.query.filter_by(user_id=user_id).all()
     habit_stats = {}
-    
+
     for checkin in all_checkins:
         if checkin.habits:
             habits_list = [h.strip() for h in checkin.habits.split(',') if h.strip()]
@@ -79,42 +79,36 @@ def dashboard():
                     habit_stats[habit] = {"total_mood": 0, "count": 0}
                 habit_stats[habit]["total_mood"] += checkin.mood_score
                 habit_stats[habit]["count"] += 1
-                
+
     ranked_habits = []
     for habit, stats in habit_stats.items():
         avg = stats["total_mood"] / stats["count"]
         ranked_habits.append({"habit": habit, "average_mood": round(avg, 2)})
-        
+
     ranked_habits.sort(key=lambda x: x["average_mood"], reverse=True)
 
-# ═══════════════════════════════════════════
-# AUTH (signup, login, forgot password)
-# ═══════════════════════════════════════════
-@main.route("/signup", methods=["GET", "POST"])
-def signup():
-    if request.method == "POST":
-        # backend: create user account
-        return redirect(url_for("main.goals"))
-    return render_template("signup.html")
-
-
     # 6. Find Common Habit Combinations on High-Mood Days (Mood >= 4)
+    # Goal: Identify which habits frequently appear together when the user is happy
     habit_pairs = []
     for checkin in all_checkins:
         if checkin.mood_score >= 4 and checkin.habits:
+            # Clean and sort so ('A', 'B') is treated the same as ('B', 'A')
             habits_list = sorted([h.strip() for h in checkin.habits.split(',') if h.strip()])
             if len(habits_list) >= 2:
+                # Generate all possible pairs of habits from this check-in
                 pairs = list(combinations(habits_list, 2))
                 habit_pairs.extend(pairs)
-                
+
+    # Count the frequencies of each pair and get the top 3
     pair_counts = Counter(habit_pairs)
     top_combinations = [{"pair": " + ".join(pair), "count": count} for pair, count in pair_counts.most_common(3)]
-                    
-    print(f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}", flush=True)
 
+    print(
+        f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}",
+        flush=True)
 
     return render_template(
-        "home.html", 
+        "home.html",
         has_checked_in_today=has_checked_in_today,
         total_checkins=total_checkins,
         average_mood=average_mood,
@@ -122,6 +116,7 @@ def signup():
         ranked_habits=ranked_habits,
         top_combinations=top_combinations
     )
+
 
 # ═══════════════════════════════════════════
 # ONBOARDING
@@ -131,9 +126,11 @@ def signup():
 def goals():
     """Handle user onboarding: Save selected habits and optional user goal."""
     if request.method == 'POST':
+        # Task: Store selected habits and optional user goal
         selected_habits = request.form.get('habits')
         main_goal = request.form.get('goal')
-        
+
+        # Save to the current user's profile
         if selected_habits:
             current_user.selected_habits = selected_habits
         if main_goal:
@@ -158,11 +155,34 @@ def checkin():
 
     mood_score = request.form.get('mood_score') 
     habits = request.form.get('habits')         
-    note = request.form.get('note')             
-    
+    note = request.form.get('note')
+
     if not mood_score:
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
+
+    try:
+        mood_score = int(mood_score)
+    except ValueError:
+        flash('Invalid mood score format!')
+        return redirect(url_for('main.checkin'))
+
+    if existing_checkin:
+        flash('You have already submitted your check-in for today!')
+        return redirect(url_for('main.dashboard'))
+
+    new_checkin = CheckIn(
+        user_id=current_user.id,
+        mood_score=mood_score,
+        habits=habits,
+        note=note,
+        date=today
+    )
+    db.session.add(new_checkin)
+    db.session.commit()
+    flash('Daily check-in saved successfully!')
+    return redirect(url_for('main.dashboard'))
+
 
 
 
