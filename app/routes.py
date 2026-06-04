@@ -24,6 +24,9 @@ def premium_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ═══════════════════════════════════════════
+# HOME
+# ═══════════════════════════════════════════
 @main.route("/")
 def home():
     """Redirect to dashboard if logged in, otherwise to login page."""
@@ -65,6 +68,7 @@ def dashboard():
                 else:
                     break
 
+<<<<<<< HEAD
     # 5. Calculate Habit-Mood Insights
     all_checkins = CheckIn.query.filter_by(user_id=user_id).all()
     habit_stats = {}
@@ -84,6 +88,17 @@ def dashboard():
         ranked_habits.append({"habit": habit, "average_mood": round(avg, 2)})
         
     ranked_habits.sort(key=lambda x: x["average_mood"], reverse=True)
+=======
+# ═══════════════════════════════════════════
+# AUTH (signup, login, forgot password)
+# ═══════════════════════════════════════════
+@main.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        # backend: create user account
+        return redirect(url_for("main.goals"))
+    return render_template("signup.html")
+>>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
 
     # 6. Find Common Habit Combinations on High-Mood Days (Mood >= 4)
     # Goal: Identify which habits frequently appear together when the user is happy
@@ -103,6 +118,7 @@ def dashboard():
                     
     print(f"DEBUG: Dashboard stats for {current_user.email} -> Streak: {current_streak}, Top Combo: {top_combinations[0]['pair'] if top_combinations else 'None'}", flush=True)
 
+<<<<<<< HEAD
     return render_template(
         "home.html", 
         has_checked_in_today=has_checked_in_today,
@@ -135,6 +151,38 @@ def goals():
         return redirect(url_for('main.dashboard'))
         
     # Goal: GET displays the onboarding form
+=======
+@main.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        # backend: verify user credentials
+        return redirect(url_for("main.dashboard"))
+    return render_template("login.html")
+
+
+@main.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        # Backend will handle email sending later
+        return redirect(url_for("main.check_email"))
+    return render_template("forgot_password.html")
+
+
+@main.route("/check-email")
+def check_email():
+    return render_template("check_email.html")
+
+
+# ═══════════════════════════════════════════
+# ONBOARDING (goals → habits → complete)
+# ═══════════════════════════════════════════
+@main.route("/goals", methods=["GET", "POST"])
+def goals():
+    if request.method == "POST":
+        selected_goals = request.form.get("goals")
+        # backend: save the goals to database
+        return redirect(url_for("main.habits"))
+>>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
     return render_template("goals.html")
 
 @main.route("/checkin", methods=['GET', 'POST'])
@@ -146,6 +194,7 @@ def checkin():
     if request.method == 'GET':
         return render_template("checkin.html", existing_checkin=existing_checkin)
 
+<<<<<<< HEAD
     mood_score = request.form.get('mood_score') 
     habits = request.form.get('habits')         
     note = request.form.get('note')             
@@ -154,6 +203,51 @@ def checkin():
         flash('Mood score is required!')
         return redirect(url_for('main.checkin'))
         
+=======
+@main.route("/habits", methods=["GET", "POST"])
+def habits():
+    if request.method == "POST":
+        selected_habits = request.form.get("habits")
+        # backend: save the habits to database
+        return redirect(url_for("main.complete"))
+    return render_template("habits.html")
+
+
+@main.route("/complete")
+def complete():
+    return render_template("onboarding_complete.html")
+
+
+# ═══════════════════════════════════════════
+# DASHBOARD & CHECK-IN
+# ═══════════════════════════════════════════
+@main.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
+
+
+@main.route("/check-in", methods=["GET", "POST"])
+def check_in():
+    if request.method == "POST":
+        mood = request.form.get("mood")
+        habits_done = request.form.get("habits_done")
+        # backend: save check-in to database
+        return redirect(url_for("main.check_in_complete"))
+    # For now, no habits passed (backend will add them)
+    return render_template("check_in.html", habits=[])
+
+
+@main.route("/check-in-complete")
+def check_in_complete():
+    return render_template("check_in_complete.html")
+
+
+# ═══════════════════════════════════════════
+# ONE BUTTON APP (demo)
+# ═══════════════════════════════════════════
+@main.route("/submit", methods=["POST"])
+def submit():
+>>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
     try:
         mood_score = int(mood_score)
     except ValueError:
@@ -297,6 +391,7 @@ def cancel_premium():
     if user.plan == 'premium':
         user.plan = 'free'
         db.session.commit()
+<<<<<<< HEAD
         flash("Your Premium subscription has been cancelled.")
     
     return redirect(url_for('main.settings'))
@@ -317,3 +412,22 @@ def delete_account():
     logout_user()
     flash("Your account has been permanently deleted.")
     return redirect(url_for('main.home'))
+=======
+        flash("Button click saved successfully.")
+    except Exception as e:
+        db.session.rollback()
+        logger.exception("Database error while saving button click: %s", e)
+        flash("Could not save button click.")
+    return redirect(url_for("main.home"))
+
+
+@main.route("/insights/history")
+def insights_history():
+    # backend: fetch user's past insight records
+    # Each record needs: id, date_range, days
+    return render_template("insight_history.html", records=[], selected_period="1m")
+
+@main.route("/insights")
+def insights():
+    return render_template("insights.html")
+>>>>>>> e2ea9eb4009ca171eff7dc633c135ffd265962a6
