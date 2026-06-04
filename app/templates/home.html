@@ -80,7 +80,21 @@
           <span class="text-white font-bold text-lg tracking-tight">HabitMind</span>
         </div>
 
-        
+        {% if current_user.is_authenticated %}
+          <div class="flex items-center gap-4">
+            <div class="px-3 py-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 text-emerald-300 text-sm font-medium">
+              Plan: {{ current_user.plan | upper }}
+              {% if current_user.is_premium() %} ⭐ {% endif %}
+            </div>
+            <a href="/logout" class="text-white/70 hover:text-white text-sm font-medium transition">
+              Log out
+            </a>
+          </div>
+        {% else %}
+          <a href="/login" class="signin-link text-emerald-300 text-sm font-medium px-4 py-2 rounded-lg">
+            Sign in
+          </a>
+        {% endif %}
 
       </header>
 
@@ -110,8 +124,6 @@
             </div>
           </div>
 
-          
-
           <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-5 leading-[1.08] tracking-tight">
             Build habits that
             <span
@@ -130,21 +142,41 @@
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/signup"
-              class="btn-primary group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-emerald-900 text-base shadow-xl"
-              style="background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);"
-            >
-              Get Started
-              <svg class="arrow-icon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-              </svg>
-            </a>
+            {% if current_user.is_authenticated %}
+              <div class="bg-white/10 border border-emerald-400/30 p-6 rounded-2xl backdrop-blur-sm w-full max-w-lg mx-auto shadow-xl">
+                <h2 class="text-2xl font-bold text-white mb-2">Welcome to your Dashboard!</h2>
+                <p class="text-emerald-100/80 text-sm mb-4">You are all set. Here are your focus areas:</p>
+                
+                <div class="flex flex-wrap justify-center gap-2">
+                  {% if current_user.selected_goals %}
+                    {% for goal in current_user.selected_goals.split(',') %}
+                      <span class="px-4 py-1.5 bg-emerald-500/30 text-emerald-300 rounded-full text-sm font-semibold uppercase tracking-wider border border-emerald-400/50 shadow-sm">
+                        #{{ goal }}
+                      </span>
+                    {% endfor %}
+                  {% else %}
+                    <a href="/goals" class="text-emerald-400 hover:text-emerald-300 underline text-sm transition">Set your goals now</a>
+                  {% endif %}
+                </div>
+              </div>
 
-            <a href="/login"
-              class="btn-secondary inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-emerald-100 text-base border border-white/20 bg-white/5 backdrop-blur-sm"
-            >
-              I already have an account
-            </a>
+            {% else %}
+              <a href="/signup"
+                class="btn-primary group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-emerald-900 text-base shadow-xl"
+                style="background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);"
+              >
+                Get Started
+                <svg class="arrow-icon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </a>
+              
+              <a href="/login"
+                class="btn-secondary inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-emerald-100 text-base border border-white/20 bg-white/5 backdrop-blur-sm"
+              >
+                I already have an account
+              </a>
+            {% endif %}
           </div>
 
         </section>
