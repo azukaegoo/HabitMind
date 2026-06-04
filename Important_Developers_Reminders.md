@@ -11,13 +11,6 @@ cd DPD_Team_SGD
 
 ---
 
-# Before Starting Work
-
-Always pull the latest changes first:
-
-```bash
-git pull
-```
 
 Start the Docker containers:
 
@@ -169,7 +162,6 @@ The `-v` option deletes the PostgreSQL database volume and removes local databas
 ## Start of Work
 
 ```bash
-git pull
 docker compose up
 ```
 
