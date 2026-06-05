@@ -343,4 +343,3 @@ def delete_account():
     logout_user()
     flash("Your account has been permanently deleted.")
     return redirect(url_for('main.home'))
-
