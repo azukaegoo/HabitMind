@@ -108,7 +108,7 @@ def dashboard():
         flush=True)
 
     return render_template(
-        "home.html",
+        "dashboard.html", 
         has_checked_in_today=has_checked_in_today,
         total_checkins=total_checkins,
         average_mood=average_mood,
@@ -124,23 +124,18 @@ def dashboard():
 @main.route("/goals", methods=['GET', 'POST'])
 @login_required
 def goals():
-    """Handle user onboarding: Save selected habits and optional user goal."""
+    """Handle user onboarding Step 1: Save selected goals."""
     if request.method == 'POST':
-        # Task: Store selected habits and optional user goal
-        selected_habits = request.form.get('habits')
-        main_goal = request.form.get('goal')
+        selected_goals = request.form.get('goals')
 
-        # Save to the current user's profile
-        if selected_habits:
-            current_user.selected_habits = selected_habits
-        if main_goal:
-            current_user.selected_goals = main_goal
-            
-        db.session.commit()
-        print(f"DEBUG: Onboarding saved for {current_user.email} -> Goal: {main_goal}, Habits: {selected_habits}", flush=True)
+        if selected_goals:
+            current_user.selected_goals = selected_goals
+            db.session.commit()
+            print(f"DEBUG: Goals saved for {current_user.email} -> {selected_goals}", flush=True)
         
-        flash('Onboarding complete! Welcome to your dashboard.')
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('main.habits')) 
+        
+    return render_template("goals.html")
 
 
 @main.route("/checkin", methods=['GET', 'POST'])
@@ -343,3 +338,35 @@ def delete_account():
     logout_user()
     flash("Your account has been permanently deleted.")
     return redirect(url_for('main.home'))
+
+# ----------------------------------------------------
+# Onboarding Step 2: Habit Selection
+# ----------------------------------------------------
+@main.route("/habits", methods=['GET', 'POST'])
+@login_required
+def habits():
+    """Handle user onboarding Step 2: Save selected habits."""
+    if request.method == 'POST':
+        # Use the variable name 'habits' according to Notion specifications
+        selected_habits = request.form.get('habits')
+        
+        if selected_habits:
+            current_user.selected_habits = selected_habits
+            db.session.commit()
+            print(f"DEBUG: Habits saved for {current_user.email} -> {selected_habits}", flush=True)
+            
+        # Redirect to the final completion page once saved
+        return redirect(url_for('main.complete'))
+        
+    # Render the habit selection template for GET requests
+    return render_template("habits.html")
+
+# ----------------------------------------------------
+# Onboarding Step 3: Completion Screen
+# ----------------------------------------------------
+@main.route("/complete", methods=['GET'])
+@login_required
+def complete():
+    """Handle user onboarding Step 3: Show completion screen."""
+    # Render the onboarding complete template (the dashboard link button is in the HTML)
+    return render_template("onboarding_complete.html")

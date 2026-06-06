@@ -1,6 +1,6 @@
 import sys
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash
-from flask_login import login_user, logout_user  
+from flask_login import login_user, logout_user, current_user 
 from .models import db, User
 
 auth_bp = Blueprint('auth', __name__)
@@ -22,7 +22,9 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         
-        return redirect(url_for('auth.login'))
+        # Auto-login and redirect to onboarding
+        login_user(new_user)
+        return redirect(url_for('main.goals'))
         
     return render_template('signup.html')
 
@@ -44,6 +46,10 @@ def login():
             
             print(f"DEBUG: User logged in - Email: {user.email}, Plan: {user.plan}", flush=True)
             print(f"DEBUG: Is user premium? -> {user.is_premium()}", flush=True)
+            
+            # If onboarding is not complete, redirect to goals
+            if not user.selected_goals:
+                return redirect(url_for('main.goals'))
             
             return redirect(url_for('main.dashboard'))
         else:

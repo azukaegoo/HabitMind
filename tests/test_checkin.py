@@ -29,3 +29,25 @@ def test_weekly_insight_generation_and_view(client, app, authenticated_user):
         sess['_fresh'] = True
     response_post = client.post('/insights/generate', follow_redirects=True)
     assert response_post.status_code == 200
+
+def test_goals_onboarding_redirects_to_habits(client, app, authenticated_user):
+    """Verify that submitting goals redirects to the habits selection step."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+        
+    response = client.post('/goals', data={'goals': 'sleep,stress'}, follow_redirects=False)
+    
+    assert response.status_code == 302
+    assert "/habits" in response.headers['Location']
+
+def test_habits_onboarding_redirects_to_complete(client, app, authenticated_user):
+    """Verify that submitting habits redirects to the completion screen."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(authenticated_user.id)
+        sess['_fresh'] = True
+        
+    response = client.post('/habits', data={'habits': 'exercise-30,read'}, follow_redirects=False)
+    
+    assert response.status_code == 302
+    assert "/complete" in response.headers['Location']
