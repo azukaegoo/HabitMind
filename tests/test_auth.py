@@ -3,7 +3,7 @@ from app.models import User
 from app import db
 
 def test_user_registration(client, app):
-    """Verify that a new user is auto-logged in and redirected to goals."""
+    """Verify that a new user is redirected to login after registration."""
     response = client.post('/register', data={
         'email': 'new_onboarding_user@test.com',
         'password': 'password123',
@@ -11,7 +11,7 @@ def test_user_registration(client, app):
     }, follow_redirects=False)
 
     assert response.status_code == 302
-    assert "/goals" in response.headers['Location']
+    assert "/login" in response.headers['Location']
 
 def test_new_user_login_redirects_to_goals(client, app):
     """Verify that a user who hasn't done onboarding is redirected to goals."""
