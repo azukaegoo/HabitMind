@@ -25,7 +25,14 @@ jobs:
 
     env:
       SECRET_KEY: test-secret-key
-      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
       PYTHONPATH: ${{ github.workspace }}
 
     steps:

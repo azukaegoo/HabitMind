@@ -5,11 +5,14 @@ services:
       - "5000:5000"
     env_file:
       - .env
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     depends_on:
       - db
     volumes:
       - .:/app
-
 
   db:
     image: postgres:16.10-alpine
