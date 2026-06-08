@@ -353,13 +353,20 @@
 
           </form>
 
-          <!-- Max selection message -->
-          <div id="maxMessage" class="text-center mb-6 hidden">
-            <p class="text-amber-300 text-sm font-medium">You've reached the maximum of 7 habits</p>
-          </div>
-
         </div>
       </main>
+
+      <!-- Max selection TOAST (floats above sticky Continue button, auto-hides) -->
+      <div id="maxMessage" class="fixed left-1/2 -translate-x-1/2 z-40 hidden px-5 py-3 rounded-full shadow-xl border" style="bottom: 110px; background: #422006; border-color: #fbbf24;">
+        <p class="text-amber-300 text-sm font-medium flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" x2="12" y1="8" y2="12"/>
+            <line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+          You've reached the maximum of 7 habits
+        </p>
+      </div>
 
       <!-- Sticky Continue Button -->
       <div class="fixed bottom-0 left-0 right-0 p-6 z-30" style="background: linear-gradient(to top, #022c22 0%, #022c22 60%, transparent 100%);">
@@ -397,7 +404,7 @@
         if (selectedHabits.length >= maxHabits) {
           const maxMsg = document.getElementById('maxMessage');
           maxMsg.classList.remove('hidden');
-          setTimeout(() => { maxMsg.classList.add('hidden'); }, 2000);
+          setTimeout(() => { maxMsg.classList.add('hidden'); }, 2500);
           return;
         }
         selectedHabits.push(habitId);
