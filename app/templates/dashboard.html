@@ -19,7 +19,6 @@
 
   <div class="relative z-10 min-h-screen px-4 py-8 pb-28">
 
-    <!-- HEADER -->
     <header class="max-w-2xl mx-auto flex items-center justify-between mb-8">
       <a href="/" class="flex items-center gap-3 no-underline">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style="background: #157a5c;">
@@ -39,13 +38,11 @@
       </a>
     </header>
 
-    <!-- GREETING -->
     <div class="max-w-2xl mx-auto mb-8">
       <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color: #134e3a;">Good morning, {{ user.name if user else 'there' }}! 👋</h1>
       <p class="text-sm" style="color: #5b8a76;">Let's take care of yourself today</p>
     </div>
 
-    <!-- TODAY'S CHECK-IN CARD -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl shadow-md overflow-hidden">
         <div class="px-6 py-3" style="background: #157a5c;">
@@ -71,7 +68,6 @@
       </div>
     </div>
 
-    <!-- STREAK + MOOD -->
     <div class="max-w-2xl mx-auto mb-5 grid grid-cols-2 gap-4">
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
         <div class="flex items-start justify-between mb-2">
@@ -100,25 +96,56 @@
       </div>
     </div>
 
-    <!-- WEEKLY REFLECTION (Core feature - available to ALL users per Gloria's feedback) -->
+    {% set count = user.checkin_count if user and user.checkin_count else 0 %}
+    {% if count < 7 %}
+      <div class="max-w-2xl mx-auto mb-5">
+        <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #fef3c7;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2 class="text-lg font-bold" style="color: #134e3a;">Insights</h2>
+            <span class="text-xs font-bold ml-auto px-2 py-1 rounded-full" style="background: #fef3c7; color: #b45309;">LOCKED</span>
+          </div>
+          <p class="text-sm mb-4" style="color: #5b8a76;">Complete 7 check-ins to unlock insights about your habits and mood patterns.</p>
+          <div class="w-full h-2 rounded-full overflow-hidden" style="background: #e8efeb;">
+            <div class="h-full rounded-full" style="width: {{ (count / 7 * 100) }}%; background: linear-gradient(90deg, #7dd9b0, #1fa97a);"></div>
+          </div>
+          <p class="text-xs mt-2 font-medium" style="color: #5b8a76;">{{ count }} / 7 check-ins</p>
+        </div>
+      </div>
+    {% else %}
+      <div class="max-w-2xl mx-auto mb-5">
+        <a href="/insights" class="block rounded-2xl bg-white border border-gray-100 shadow-sm p-6 no-underline hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold" style="color: #134e3a;">Weekly Reflection</h2>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ml-auto"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+          <p class="text-sm" style="color: #5b8a76;">See a summary of your past week — your average mood, top habits, and patterns.</p>
+        </a>
+      </div>
+    {% endif %}
+
     <div class="max-w-2xl mx-auto mb-5">
-      <a href="/insights" class="block rounded-2xl bg-white border border-gray-100 shadow-sm p-6 no-underline hover:shadow-md transition-shadow">
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </div>
-          <h2 class="text-lg font-bold" style="color: #134e3a;">Weekly Reflection</h2>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ml-auto"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <h2 class="text-lg font-bold" style="color: #134e3a;">Personalized Recommendations</h2>
+          <span class="text-xs font-bold ml-auto px-2 py-1 rounded-full" style="background: #f3e8ff; color: #7c3aed;">PREMIUM</span>
         </div>
-        <p class="text-sm" style="color: #5b8a76;">See a summary of your past week — your average mood, top habits, and patterns.</p>
-      </a>
+        <p class="text-sm" style="color: #5b8a76;">Get AI-driven personalized tone analysis and tailored activity recommendations — unlock with Premium.</p>
+      </div>
     </div>
 
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
     <div class="max-w-2xl mx-auto flex items-center justify-around">
       <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">

@@ -28,10 +28,10 @@ def premium_required(f):
 # ═══════════════════════════════════════════
 @main.route("/")
 def home():
-    """Redirect to dashboard if logged in, otherwise to login page."""
+    """Redirect to dashboard if logged in, otherwise show homepage."""
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
-    return redirect(url_for('auth.login'))
+    return render_template("home.html")
 
 @main.route("/dashboard")
 @login_required
@@ -198,7 +198,16 @@ def premium_insights():
 @main.route("/insights", methods=['GET'])
 @login_required
 def view_insights():
-    """Goal: Users can view previous insight summaries."""
+    """Goal: Users can view previous insight summaries.
+       Rule: Locked for new users until they reach 7 check-ins."""
+       
+    total_checkins = CheckIn.query.filter_by(user_id=current_user.id).count()
+    
+    if total_checkins < 7:
+        remaining = 7 - total_checkins
+        flash(f"Keep going! You need {remaining} more check-in{'s' if remaining > 1 else ''} to unlock your Insights.", "info")
+        return redirect(url_for('main.dashboard'))
+
     past_insights = WeeklyInsight.query.filter_by(user_id=current_user.id).order_by(WeeklyInsight.end_date.desc()).all()
     return render_template("insights.html", insights=past_insights)
 
@@ -310,15 +319,19 @@ def update_settings():
 @main.route("/settings/cancel-premium", methods=['POST'])
 @login_required
 def cancel_premium():
-    """Task: Unsubscribe from premium."""
+    """Task: Unsubscribe from premium and delete premium data."""
     user = db.session.get(User, current_user.id)
 
     if user.plan == 'premium':
         user.plan = 'free'
+        
+        WeeklyInsight.query.filter_by(user_id=user.id).delete()
+        
         db.session.commit()
-
-        flash("Your Premium subscription has been cancelled.")
-    
+        flash("Your Premium subscription has been cancelled and premium data has been removed.")
+    else:
+        flash("You are not currently on a Premium plan.")
+        
     return redirect(url_for('main.settings'))
 
 
@@ -370,3 +383,47 @@ def complete():
     """Handle user onboarding Step 3: Show completion screen."""
     # Render the onboarding complete template (the dashboard link button is in the HTML)
     return render_template("onboarding_complete.html")
+
+import csv
+from io import StringIO
+from flask import make_response
+
+@main.route("/export-data", methods=['GET'])
+@login_required
+def export_data():
+    """Task: Export user data to CSV, with check if data exists."""
+    user_id = current_user.id
+    
+    checkins = CheckIn.query.filter_by(user_id=user_id).order_by(CheckIn.date.desc()).all()
+    
+    if not checkins:
+        flash("There is no data to export yet.", "error")
+        return redirect(url_for('main.settings'))
+
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Date', 'Mood Score', 'Habits', 'Notes'])
+    
+    for c in checkins:
+        cw.writerow([c.date, c.mood_score, c.habits, c.note])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=habitmind_data.csv"
+    output.headers["Content-type"] = "text/csv"
+    
+    return output
+
+@main.route("/upgrade", methods=['POST'])
+@login_required
+def upgrade_premium():
+    """Task: Upgrade user to premium plan."""
+    user = db.session.get(User, current_user.id)
+    
+    if user.plan != 'premium':
+        user.plan = 'premium'
+        db.session.commit()
+        flash('Successfully upgraded to Premium!', 'success')
+    else:
+        flash('You are already a Premium member.', 'info')
+        
+    return redirect(url_for('main.settings'))

@@ -9,12 +9,27 @@
 </head>
 <body>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <div class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-md px-4">
+              {% for category, message in messages %}
+                  <div class="flex items-center justify-between p-4 mb-2 text-sm text-white rounded-lg shadow-lg transition-opacity duration-300 {% if category == 'success' %}bg-green-500{% else %}bg-red-500{% endif %}" role="alert">
+                      <div class="font-medium">{{ message }}</div>
+                      <button type="button" class="ml-4 text-white hover:text-gray-200 focus:outline-none" onclick="this.parentElement.style.display='none';" aria-label="Close">
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                          </svg>
+                      </button>
+                  </div>
+              {% endfor %}
+          </div>
+      {% endif %}
+  {% endwith %}
   <div
     class="min-h-screen relative overflow-hidden"
     style="background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%);"
   >
 
-    <!-- Ambient glow blobs -->
     <div
       class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20"
       style="background: radial-gradient(ellipse, #34d399 0%, transparent 70%);"
@@ -28,19 +43,15 @@
       style="background: radial-gradient(ellipse, #059669 0%, transparent 70%);"
     ></div>
 
-    <!-- Subtle grid overlay -->
     <div
       class="pointer-events-none absolute inset-0 opacity-[0.03]"
       style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 64px 64px;"
     ></div>
 
-    <!-- Page wrapper -->
     <div class="relative z-10 flex flex-col min-h-screen">
 
-      <!-- ═══ HEADER ═══ -->
       <header class="px-6 pt-6 pb-2 flex items-center justify-between max-w-5xl mx-auto w-full">
 
-        <!-- Logo lockup -->
         <a href="/" class="flex items-center gap-3 no-underline">
           <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -66,16 +77,13 @@
         </a>
       </header>
 
-      <!-- ═══ MAIN ═══ -->
       <main class="flex-1 flex items-center justify-center px-4 py-10">
 
-        <!-- Login card -->
         <div
           class="w-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 md:p-10"
           style="max-width: 28rem;"
         >
 
-          <!-- Card brain logo -->
           <div class="flex justify-center mb-6">
             <div
               class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl"
@@ -95,16 +103,13 @@
             </div>
           </div>
 
-          <!-- Card heading -->
           <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-white mb-1.5">Welcome back</h1>
             <p class="text-emerald-200 text-sm">Sign in to continue your journey</p>
           </div>
 
-          <!-- Login form -->
           <form action="/login" method="POST" class="flex flex-col gap-5">
 
-            <!-- Email -->
             <div class="flex flex-col gap-1.5">
               <label for="email" class="text-emerald-100 text-sm font-medium">Email</label>
               <input
@@ -118,7 +123,6 @@
               />
             </div>
 
-            <!-- Password -->
             <div class="flex flex-col gap-1.5">
               <label for="password" class="text-emerald-100 text-sm font-medium">Password</label>
               <input
@@ -132,7 +136,6 @@
               />
             </div>
 
-            <!-- Submit button -->
             <button
               type="submit"
               class="btn-primary mt-1 w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-emerald-900 text-base shadow-xl"
@@ -144,14 +147,12 @@
               </svg>
             </button>
 
-            <!-- Forgot password (under login button per Gloria's feedback) -->
             <p class="text-center mt-2">
               <a href="/forgot-password" class="text-link text-emerald-300 text-sm font-medium">Forgot password?</a>
             </p>
 
           </form>
 
-          <!-- Sign up prompt -->
           <p class="text-center text-emerald-200/60 text-sm mt-6">
             Don't have an account?
             <a href="/signup" class="text-link text-emerald-300 font-medium ml-1">Sign up</a>
@@ -160,7 +161,6 @@
         </div>
       </main>
 
-      <!-- ═══ FOOTER ═══ -->
       <footer class="text-center py-6 px-4">
         <p class="text-emerald-500/50 text-xs">
           Free forever &middot; No credit card required &middot; Built for your well-being
