@@ -18,7 +18,7 @@ def test_checkin_integration_flow(client, app, authenticated_user):
         sess['_user_id'] = str(authenticated_user.id)
         sess['_fresh'] = True
     form_data = {"mood_score": "4", "habits": "exercise, reading", "note": "Studied hard today!"}
-    response = client.post('/checkin', data=form_data, follow_redirects=True)
+    response = client.post('/check-in', data=form_data, follow_redirects=True)
     assert response.status_code == 200
 
 @pytest.mark.skip(reason="Waiting for Safrin's frontend templates")
