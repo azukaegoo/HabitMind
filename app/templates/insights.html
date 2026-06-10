@@ -52,43 +52,7 @@
       </div>
     </div>
 
-    {% set checkin_count = checkin_done if checkin_done else 0 %}
-    {% set min_required = checkin_total if checkin_total else 7 %}
-
-    {% if checkin_count < min_required %}
-    <!-- EMPTY STATE for new users (0-6 check-ins) -->
-    <div class="max-w-2xl mx-auto mb-5">
-      <div class="rounded-3xl bg-white border border-gray-100 shadow-md p-8 text-center">
-        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5" style="background: linear-gradient(135deg, #d8f3e6 0%, #a8e6c9 100%);">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1fa97a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </div>
-        <h2 class="text-xl font-bold mb-2" style="color: #134e3a;">Your insights are coming! 🌱</h2>
-        <p class="text-sm mb-6 max-w-sm mx-auto" style="color: #5b8a76;">
-          Complete <span class="font-bold" style="color: #157a5c;">{{ min_required - checkin_count }} more check-in{% if min_required - checkin_count != 1 %}s{% endif %}</span> to unlock your first weekly reflection and personalized insights.
-        </p>
-        <div class="max-w-xs mx-auto mb-3">
-          <div class="flex items-center justify-between mb-2">
-            <p class="text-xs font-semibold" style="color: #5b8a76;">Progress</p>
-            <p class="text-xs font-bold" style="color: #157a5c;">{{ checkin_count }} / {{ min_required }} check-ins</p>
-          </div>
-          <div class="w-full h-3 rounded-full overflow-hidden" style="background: #e8efeb;">
-            <div class="h-full rounded-full transition-all duration-500" style="width: {{ (checkin_count / min_required * 100) }}%; background: linear-gradient(90deg, #7dd9b0, #1fa97a);"></div>
-          </div>
-        </div>
-        <a href="/checkin" class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 mt-4 rounded-xl font-bold text-white text-sm shadow-md no-underline" style="background: linear-gradient(135deg, #1fa97a 0%, #157a5c 100%);">
-          Start Today's Check-in
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-
-    {% else %}
-    <!-- FULL STATS for users with 7+ check-ins -->
+    <!-- STATS -->
     <div class="max-w-2xl mx-auto mb-5 grid grid-cols-2 gap-4">
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 text-center">
         <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #f3e8ff;">
@@ -97,8 +61,10 @@
           </svg>
         </div>
         <p class="text-xs font-semibold mb-1" style="color: #5b8a76;">Check-in Completed</p>
-        <p class="text-3xl font-bold mb-2" style="color: #134e3a;">{{ checkin_done }} <span class="text-base font-medium" style="color: #5b8a76;">/ {{ checkin_total if checkin_total else 7 }}</span></p>
-        <p class="text-xs leading-snug" style="color: #8aa89b;">Great job! You've completed all check-ins for this period.</p>
+        <p class="text-3xl font-bold mb-2" style="color: #134e3a;">{{ checkin_done if checkin_done else 0 }} <span class="text-base font-medium" style="color: #5b8a76;">/ {{ checkin_total if checkin_total else 7 }}</span></p>
+        <p class="text-xs leading-snug" style="color: #8aa89b;">
+          {% if checkin_done and checkin_total and checkin_done >= checkin_total %}Great job! You've completed all check-ins for this period.{% else %}Keep checking in to complete the period.{% endif %}
+        </p>
       </div>
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 text-center">
         <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #d8f3e6;"><span class="text-2xl">😊</span></div>
@@ -154,54 +120,13 @@
       </div>
     </div>
 
-    <!-- WEEKLY REFLECTION (CORE FEATURE - FREE for everyone with 7+ check-ins) -->
-    <div class="max-w-2xl mx-auto mb-5">
-      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <h3 class="text-base font-bold" style="color: #134e3a;">Weekly Reflection</h3>
-        </div>
-
-        {% if reflection %}
-          <div class="text-3xl mb-1 leading-none" style="color: #7c3aed;">"</div>
-          <p class="text-sm leading-relaxed mb-3" style="color: #134e3a;">{{ reflection.text|safe }}</p>
-          
-          {% if not is_premium %}
-          <!-- Free users see this small note -->
-          <div class="mt-4 pt-4 border-t flex items-start gap-2" style="border-color: #e8efeb;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-            <p class="text-xs" style="color: #6d28d9;">
-              <span class="font-bold">Upgrade to Premium</span> to customize the tone of your reflections (Supportive, Balanced, or Challenge Me).
-            </p>
-          </div>
-          {% endif %}
-        {% else %}
-          <p class="text-sm leading-relaxed" style="color: #5b8a76;">Your weekly reflection will appear here, based on your check-ins and habits.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    {% endif %}
-
-    <!-- RECOMMENDED NEAR YOU (Premium only) -->
-    <div class="max-w-2xl mx-auto mb-5">
+    <!-- REFLECTION + RECOMMENDED NEAR YOU (side-by-side, both premium) -->
+    <div class="max-w-2xl mx-auto mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Reflection card -->
       <div class="rounded-2xl border border-gray-100 shadow-sm p-5" style="background: {% if is_premium %}#ffffff{% else %}#f5f0fc{% endif %};">
         <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #ede9fe;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold" style="color: #134e3a;">Recommended Near You</h3>
-          </div>
+          <h3 class="text-base font-bold" style="color: #134e3a;">Reflection</h3>
           {% if not is_premium %}
           <span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full" style="background: #ede9fe; color: #6d28d9;">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -209,7 +134,31 @@
           </span>
           {% endif %}
         </div>
+        {% if is_premium and reflection %}
+          <div class="text-2xl mb-2" style="color: #7c3aed;">"</div>
+          <p class="text-sm leading-relaxed mb-2" style="color: #134e3a;">{{ reflection.text|safe }}</p>
+        {% else %}
+          <div class="text-center py-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2"/><path d="M12 19v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <p class="font-bold text-sm mb-1" style="color: #134e3a;">Personalized Reflection</p>
+            <p class="text-xs" style="color: #5b8a76;">Get reflections tailored to your progress and delivered in your preferred tone.</p>
+          </div>
+        {% endif %}
+      </div>
 
+      <!-- Recommended Near You card -->
+      <div class="rounded-2xl border border-gray-100 shadow-sm p-5" style="background: {% if is_premium %}#ffffff{% else %}#f5f0fc{% endif %};">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold" style="color: #134e3a;">Recommended Near You</h3>
+          {% if not is_premium %}
+          <span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full" style="background: #ede9fe; color: #6d28d9;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Premium
+          </span>
+          {% endif %}
+        </div>
         {% if is_premium and recommendations %}
           <p class="text-xs mb-3" style="color: #5b8a76;">Activities that can support your well-being.</p>
           <div class="space-y-3">
@@ -227,18 +176,22 @@
           <a href="#" class="block text-center mt-4 text-sm font-semibold" style="color: #7c3aed;">View more activities →</a>
         {% else %}
           <div class="text-center py-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <p class="font-bold text-sm mb-1" style="color: #134e3a;">Recommended Near You</p>
             <p class="text-xs" style="color: #5b8a76;">See activities near you that are aligned with your habits and mood patterns.</p>
           </div>
         {% endif %}
       </div>
     </div>
 
-    <!-- UPGRADE BUTTON (always shown for free users) -->
+    <!-- UPGRADE BUTTON (free users only) -->
     {% if not is_premium %}
     <div class="max-w-2xl mx-auto mb-5">
       <a href="/settings?open=reflection" class="btn-primary w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white text-sm shadow-lg no-underline" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
-        Upgrade to Premium for personalized tone and recommendations
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Upgrade to Premium to unlock personalized reflection and recommendations
       </a>
     </div>
     {% endif %}
