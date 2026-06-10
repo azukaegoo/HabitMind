@@ -10,16 +10,20 @@ from flask_login import login_required, current_user, logout_user
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, UTC, timedelta
+from flask import session
+from sqlalchemy.exc import IntegrityError
 
 from . import db
+import logging
+logger = logging.getLogger(__name__)
+
 from .models import (
     User,
     Habit,
     UserHabit,
     CheckIn,
     CheckInHabit,
-    CurrentInsight,
-    InsightReport
+    CurrentInsight
 )
 
 logger = logging.getLogger(__name__)
@@ -148,20 +152,28 @@ def goals():
 @main.route("/habits", methods=["GET", "POST"])
 @login_required
 def habits():
-    """Handle onboarding Step 2: Save selected habits."""
     if current_user.onboarding_completed:
         return redirect(url_for("main.dashboard"))
 
     if request.method == "POST":
         selected_habits = request.form.get("habits", "")
+        print(f"DEBUG: Form data received: '{selected_habits}'", flush=True)
+        
+        if not selected_habits:
+            print("DEBUG: selected_habits is empty!", flush=True)
+            flash("Please select at least 5 habits.", "error")
+            return redirect(url_for("main.habits"))
 
-        habit_ids = [
-            int(habit_id)
-            for habit_id in selected_habits.split(",")
-            if habit_id.strip()
-        ]
+        try:
+            habit_ids = [
+                int(h_id) for h_id in selected_habits.split(",") if h_id.strip().isdigit()
+            ]
+        except ValueError:
+            flash("Invalid habit selection.", "error")
+            return redirect(url_for("main.habits"))
 
         if len(habit_ids) < 5 or len(habit_ids) > 7:
+            flash(f"Please select between 5 and 7 habits. You selected {len(habit_ids)}.", "error")
             return redirect(url_for("main.habits"))
 
         for habit_id in habit_ids:
@@ -173,15 +185,11 @@ def habits():
 
         current_user.onboarding_completed = True
         db.session.commit()
-
+        flash("Habits saved successfully!", "success")
         return redirect(url_for("main.dashboard"))
 
     all_habits = Habit.query.filter_by(is_active=True).all()
-
-    return render_template(
-        "habits.html",
-        habits=all_habits
-    )
+    return render_template("habits.html", habits=all_habits)
 
 # ═══════════════════════════════════════════
 # CHECK-IN (Azuka's Update)

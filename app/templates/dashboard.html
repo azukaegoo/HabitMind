@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
   <style>
-    /* 모달창이 부드럽게 올라오는 애니메이션 */
+
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -48,8 +48,34 @@
       </a>
     </header>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="max-w-2xl mx-auto mb-6">
+          {% for category, message in messages %}
+            {% if category == 'success' %}
+              <div class="mb-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                {{ message }}
+              </div>
+            {% elif category == 'error' %}
+              <div class="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                {{ message }}
+              </div>
+            {% elif category == 'info' %}
+              <div class="mb-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">
+                {{ message }}
+              </div>
+            {% else %}
+              <div class="mb-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <div class="max-w-2xl mx-auto mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color: #134e3a;">Good morning, {{ user.name if user else 'there' }}! 👋</h1>
+      <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color: #134e3a;">Good morning, {{ user.email.split('@')[0] if user else 'there' }}! 👋</h1>
       <p class="text-sm" style="color: #5b8a76;">Let's take care of yourself today</p>
     </div>
 
@@ -59,7 +85,7 @@
           <p class="text-white text-xs font-bold tracking-wider uppercase">Today's Check-in</p>
         </div>
         <div class="bg-white p-6">
-            {% if checkin_status %}
+            {% if has_checked_in_today %}
               <h2 class="text-xl font-bold mb-1" style="color: #134e3a;">Check-in complete for today ✓</h2>
               <p class="text-sm mb-5" style="color: #5b8a76;">Great job! Come back tomorrow to keep your streak going.</p>
               <button disabled class="w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base cursor-not-allowed" style="background: #e8efeb; color: #8aa89b;">
@@ -69,7 +95,7 @@
             {% else %}
               <h2 class="text-xl font-bold mb-1" style="color: #134e3a;">You haven't checked in today</h2>
               <p class="text-sm mb-5" style="color: #5b8a76;">Take a minute to track your mood and habits.</p>
-              <a href="/check-in" class="btn-primary w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white text-base shadow-lg no-underline" style="background: linear-gradient(135deg, #1fa97a 0%, #157a5c 100%);">
+              <a href="{{ url_for('main.check_in') }}" class="btn-primary w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white text-base shadow-lg no-underline" style="background: linear-gradient(135deg, #1fa97a 0%, #157a5c 100%);">
                 Start Check-in
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
@@ -86,9 +112,9 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="#ffffff"><path d="M13 0L4 14h6l-1 10 9-14h-6z"/></svg>
           </div>
         </div>
-        <p class="text-3xl font-bold mb-1" style="color: #134e3a;">{{ user.streak if user else 0 }} <span class="text-base font-medium" style="color: #5b8a76;">days</span></p>
+        <p class="text-3xl font-bold mb-1" style="color: #134e3a;">{{ streak }} <span class="text-base font-medium" style="color: #5b8a76;">days</span></p>
         <p class="text-xs" style="color: #8aa89b;">
-          {% if user and user.streak and user.streak > 0 %}Keep it going!{% else %}Start today!{% endif %}
+          {% if streak > 0 %}Keep it going!{% else %}Start today!{% endif %}
         </p>
       </div>
 
@@ -99,14 +125,14 @@
             <span class="text-base">😊</span>
           </div>
         </div>
-        <p class="text-3xl font-bold mb-1" style="color: #134e3a;">{{ user.avg_mood if user and user.avg_mood else '—' }}</p>
+        <p class="text-3xl font-bold mb-1" style="color: #134e3a;">{{ avg_mood if avg_mood else '—' }}</p>
         <p class="text-xs" style="color: #8aa89b;">
-          {% if user and user.avg_mood %}out of 10{% else %}Check in to see{% endif %}
+          {% if avg_mood %}out of 10{% else %}Check in to see{% endif %}
         </p>
       </div>
     </div>
 
-    {% set count = user.checkin_count if user and user.checkin_count else 0 %}
+    {% set count = total_checkins %}
     {% if count < 7 %}
       <div class="max-w-2xl mx-auto mb-5">
         <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
@@ -126,7 +152,7 @@
       </div>
     {% else %}
       <div class="max-w-2xl mx-auto mb-5">
-        <a href="/insights" class="block rounded-2xl bg-white border border-gray-100 shadow-sm p-6 no-underline hover:shadow-md transition-shadow">
+        <a href="{{ url_for('main.view_insights') }}" class="block rounded-2xl bg-white border border-gray-100 shadow-sm p-6 no-underline hover:shadow-md transition-shadow">
           <div class="flex items-center gap-2 mb-3">
             <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -163,23 +189,23 @@
 
   <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
     <div class="max-w-2xl mx-auto flex items-center justify-around">
-      <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
+      <a href="{{ url_for('main.dashboard') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="text-xs font-bold" style="color: #157a5c;">Dashboard</span>
       </a>
-      <a href="/check-in" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="{{ url_for('main.check_in') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><polyline points="20 6 9 17 4 12"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Check-in</span>
       </a>
-      <a href="/insights" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="{{ url_for('main.view_insights') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Insights</span>
       </a>
-      <a href="/profile" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="{{ url_for('main.profile') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Profile</span>
       </a>
-      <a href="/logout" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="{{ url_for('auth.logout') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         <span class="text-xs font-medium" style="color: #dc2626;">Logout</span>
       </a>
@@ -199,7 +225,7 @@
       <h3 class="text-xl font-bold text-center mb-2" style="color: #134e3a;">Upgrade to Premium</h3>
       <p class="text-sm text-center mb-6" style="color: #5b8a76;">Unlock AI insights, unlimited habits, and advanced mood tracking.</p>
       
-      <form action="/upgrade" method="POST">
+      <form action="{{ url_for('main.upgrade_premium_settings') }}" method="POST">
         <button type="submit" class="w-full py-3 rounded-xl font-bold text-white text-base shadow-lg transition-transform hover:scale-[1.02] mb-3" style="background: linear-gradient(135deg, #1fa97a 0%, #157a5c 100%);">
           Yes, Upgrade Now
         </button>

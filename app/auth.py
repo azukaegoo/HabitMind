@@ -18,22 +18,34 @@ def register():
         return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
+        fullname = request.form.get('fullname')
         email = request.form.get('email')
         password = request.form.get('password')
-        
+
         if User.query.filter_by(email=email).first():
-            flash('There is an existing account with that email.', 'error')
+            flash('An account with that email already exists.', 'error')
             return redirect(url_for('auth.register'))
-            
-        # Create and save new user
-        new_user = User(email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash('Account creation successful! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
-        
+
+        try:
+            new_user = User(
+                name=fullname,
+                email=email
+            )
+
+            new_user.set_password(password)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Account created successfully! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"DEBUG: Error creating account for {email}: {e}", flush=True)
+            flash('Could not create your account. Please try again.', 'error')
+            return redirect(url_for('auth.register'))
+
     return render_template('signup.html')
 
 

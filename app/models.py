@@ -3,10 +3,12 @@ from datetime import datetime, UTC
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
 
@@ -39,6 +41,7 @@ class User(UserMixin, db.Model):
     def is_free(self):
         return self.plan == "free"
 
+
 class Habit(db.Model):
     __tablename__ = "habits"
 
@@ -47,6 +50,7 @@ class Habit(db.Model):
     category = db.Column(db.String(50), nullable=False)
     icon = db.Column(db.String(100), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
+
 
 class UserHabit(db.Model):
     __tablename__ = "user_habits"
@@ -62,6 +66,7 @@ class UserHabit(db.Model):
     )
 
     habit = db.relationship("Habit", backref="user_habits")
+
 
 class CheckIn(db.Model):
     __tablename__ = "check_ins"
@@ -91,6 +96,7 @@ class CheckIn(db.Model):
         db.UniqueConstraint("user_id", "date", name="_user_daily_checkin_uc"),
     )
 
+
 class CheckInHabit(db.Model):
     __tablename__ = "checkin_habits"
 
@@ -100,6 +106,7 @@ class CheckInHabit(db.Model):
     habit_id = db.Column(db.Integer, db.ForeignKey("habits.id"), nullable=False)
 
     habit = db.relationship("Habit", backref="checkin_habits")
+
 
 class CurrentInsight(db.Model):
     __tablename__ = "current_insights"
@@ -124,6 +131,7 @@ class CurrentInsight(db.Model):
         nullable=False
     )
 
+
 class InsightReport(db.Model):
     __tablename__ = "insight_reports"
 
@@ -139,6 +147,8 @@ class InsightReport(db.Model):
 
     top_habits_json = db.Column(db.Text, nullable=True)
     what_we_noticed = db.Column(db.Text, nullable=True)
+    goals_snapshot = db.Column(db.String(200), nullable=True)
+    habits_snapshot_json = db.Column(db.Text, nullable=True)
 
     created_at = db.Column(
         db.DateTime(timezone=True),
@@ -152,6 +162,7 @@ class InsightReport(db.Model):
         uselist=False,
         lazy=True
     )
+
 
 class PremiumInsight(db.Model):
     __tablename__ = "premium_insights"
