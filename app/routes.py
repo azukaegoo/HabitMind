@@ -124,7 +124,6 @@ def goals():
             if goal.strip()
         ]
 
-        # Basic backend safety check
         if not goals_list:
             return redirect(url_for("main.goals"))
 
@@ -186,7 +185,8 @@ def habits():
         current_user.onboarding_completed = True
         db.session.commit()
         flash("Habits saved successfully!", "success")
-        return redirect(url_for("main.dashboard"))
+        
+        return redirect(url_for("main.complete"))
 
     all_habits = Habit.query.filter_by(is_active=True).all()
     return render_template("habits.html", habits=all_habits)
