@@ -26,7 +26,8 @@ def client(app):
 def authenticated_user(app):
     """Create a test user and simulate an authenticated session."""
     with app.app_context():
-        user = User(email="test@example.com", plan="free")
+        # 🚨 수정된 부분: name="Test User" 를 추가했습니다!
+        user = User(name="Test User", email="test@example.com", plan="free")
         user.set_password("password123")
         db.session.add(user)
         db.session.commit()
