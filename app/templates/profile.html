@@ -30,7 +30,7 @@
   <div class="relative z-10 min-h-screen px-4 py-8 pb-28">
 
     <header class="max-w-2xl mx-auto flex items-center justify-between mb-6">
-      <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-3 no-underline">
+      <a href="/" class="flex items-center gap-3 no-underline">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style="background: #157a5c;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
@@ -42,36 +42,12 @@
       </a>
     </header>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="max-w-2xl mx-auto mb-6">
-          {% for category, message in messages %}
-            {% if category == 'success' %}
-              <div class="mb-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-                {{ message }}
-              </div>
-            {% elif category == 'error' %}
-              <div class="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                {{ message }}
-              </div>
-            {% elif category == 'info' %}
-              <div class="mb-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">
-                {{ message }}
-              </div>
-            {% else %}
-              <div class="mb-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700">
-                {{ message }}
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
     <div class="max-w-2xl mx-auto mb-6">
       <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color: #134e3a;">Profile</h1>
       <p class="text-sm" style="color: #5b8a76;">View your personal progress and account information.</p>
     </div>
 
+    <!-- AVATAR + USER INFO -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 text-center">
         <div class="relative inline-block mb-4">
@@ -86,7 +62,7 @@
           </div>
           {% endif %}
         </div>
-        <h2 class="text-xl font-bold mb-1" style="color: #134e3a;">{{ user.name if user and user.name else user.email.split('@')[0] }}</h2>
+        <h2 class="text-xl font-bold mb-1" style="color: #134e3a;">{{ user.email.split('@')[0] if user and user.email else 'User' }}</h2>
         <p class="text-sm mb-3" style="color: #5b8a76;">{{ user.email if user and user.email else 'your@email.com' }}</p>
         {% if user and user.plan == 'premium' %}
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold" style="background: #fef3c7; color: #b45309;">
@@ -101,6 +77,7 @@
       </div>
     </div>
 
+    <!-- STATS CARDS -->
     <div class="max-w-2xl mx-auto mb-5 grid grid-cols-3 gap-3">
       <div class="stat-card rounded-2xl bg-white border border-gray-100 shadow-sm p-4 text-center">
         <div class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2" style="background: #fef3c7;">
@@ -123,6 +100,7 @@
       </div>
     </div>
 
+    <!-- YOUR GOALS (with Edit button) -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -132,7 +110,7 @@
             </div>
             <h3 class="text-base font-bold" style="color: #134e3a;">Your Goals</h3>
           </div>
-          <a href="{{ url_for('main.edit_goals') }}" class="edit-btn inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg no-underline border transition" style="color: #7c3aed; border-color: #ede9fe; background: #ffffff;">
+          <a href="/goals" class="edit-btn inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg no-underline border transition" style="color: #7c3aed; border-color: #ede9fe; background: #ffffff;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 20h9"/>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
@@ -147,11 +125,12 @@
             {% endfor %}
           </div>
         {% else %}
-          <p class="text-sm" style="color: #5b8a76;">No goals set yet. <a href="{{ url_for('main.edit_goals') }}" class="font-semibold no-underline hover:underline" style="color: #7c3aed;">Set your goals →</a></p>
+          <p class="text-sm" style="color: #5b8a76;">No goals set yet. <a href="/goals" class="font-semibold no-underline hover:underline" style="color: #7c3aed;">Set your goals →</a></p>
         {% endif %}
       </div>
     </div>
 
+    <!-- YOUR HABITS (with Edit button) -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -161,7 +140,7 @@
             </div>
             <h3 class="text-base font-bold" style="color: #134e3a;">Your Habits</h3>
           </div>
-          <a href="{{ url_for('main.edit_habits') }}" class="edit-btn inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg no-underline border transition" style="color: #7c3aed; border-color: #ede9fe; background: #ffffff;">
+          <a href="/habits" class="edit-btn inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg no-underline border transition" style="color: #7c3aed; border-color: #ede9fe; background: #ffffff;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 20h9"/>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
@@ -169,18 +148,33 @@
             Edit
           </a>
         </div>
-        {% if selected_habits %}
+        {% if user and user.selected_habits %}
           <div class="flex flex-wrap gap-2">
-            {% for habit in selected_habits %}
-              <span class="px-3 py-1.5 rounded-full text-xs font-semibold border" style="border-color: #d8f3e6; color: #134e3a; background: #f7faf8;">{{ habit.name }}</span>
+            {% for habit in user.selected_habits.split(',') %}
+              <span class="px-3 py-1.5 rounded-full text-xs font-semibold border" style="border-color: #d8f3e6; color: #134e3a; background: #f7faf8;">{{ habit.strip() }}</span>
             {% endfor %}
           </div>
         {% else %}
-          <p class="text-sm" style="color: #5b8a76;">No habits selected yet. <a href="{{ url_for('main.edit_habits') }}" class="font-semibold no-underline hover:underline" style="color: #7c3aed;">Choose habits →</a></p>
+          <p class="text-sm" style="color: #5b8a76;">No habits selected yet. <a href="/habits" class="font-semibold no-underline hover:underline" style="color: #7c3aed;">Choose habits →</a></p>
         {% endif %}
       </div>
     </div>
 
+    <!-- SETTINGS LINK -->
+    <div class="max-w-2xl mx-auto mb-5">
+      <a href="/settings" class="settings-link block rounded-2xl bg-white border border-gray-100 shadow-sm p-4 no-underline transition flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #ede9fe;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm" style="color: #134e3a;">Settings</p>
+          <p class="text-xs" style="color: #5b8a76;">Manage your account and preferences</p>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </div>
+
+    <!-- MOTIVATION FOOTER -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl border p-4 flex items-center gap-3" style="background: #f0fdf4; border-color: #d8f3e6;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1fa97a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
@@ -198,13 +192,14 @@
 
   </div>
 
+  <!-- BOTTOM NAV (with Logout per Gloria's feedback) -->
   <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
     <div class="max-w-2xl mx-auto flex items-center justify-around">
-      <a href="{{ url_for('main.dashboard') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Dashboard</span>
       </a>
-      <a href="{{ url_for('main.check_in') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="/checkin" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><polyline points="20 6 9 17 4 12"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Check-in</span>
       </a>
@@ -212,11 +207,11 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Insights</span>
       </a>
-      <a href="{{ url_for('main.profile') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
+      <a href="/profile" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
         <span class="text-xs font-bold" style="color: #157a5c;">Profile</span>
       </a>
-      <a href="{{ url_for('auth.logout') }}" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+      <a href="/logout" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         <span class="text-xs font-medium" style="color: #dc2626;">Logout</span>
       </a>
