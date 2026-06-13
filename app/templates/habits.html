@@ -28,7 +28,7 @@
 
       <!-- Header -->
       <header class="px-6 pt-6 pb-2 flex items-center justify-between max-w-5xl mx-auto w-full">
-        <a href="/" class="flex items-center gap-3 no-underline">
+        <a href="#" class="flex items-center gap-3 no-underline">
           <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
@@ -44,13 +44,13 @@
           </div>
           <span class="text-white font-bold text-lg tracking-tight">HabitMind</span>
         </a>
-        <a href="/goals" class="text-emerald-300 hover:text-white text-sm font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/10">
+        <a href="{% if is_edit %}{{ url_for('main.profile') }}{% else %}{{ url_for('main.goals') }}{% endif %}" class="text-emerald-300 hover:text-white text-sm font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/10">
           Back
         </a>
       </header>
 
       <!-- Selection Counter Badge (Floating) -->
-      <div class="fixed top-24 right-6 z-20">
+      <div class="fixed top-24 right-6 z-20 pointer-events-none">
         <div class="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
           <p class="text-emerald-300 text-sm font-bold">
             <span id="counterDisplay">0 / 7</span> selected
@@ -63,6 +63,7 @@
         <div class="w-full max-w-5xl mx-auto">
 
           <!-- Progress Indicator -->
+          {% if not is_edit %}
           <div class="mb-10 text-center">
             <p class="text-emerald-300/70 text-sm font-medium mb-4">Step 2 of 3</p>
             <div class="flex gap-2 justify-center">
@@ -71,19 +72,28 @@
               <div class="h-1.5 w-16 rounded-full bg-white/20"></div>
             </div>
           </div>
+          {% endif %}
 
           <!-- Heading -->
           <div class="text-center mb-12">
             <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
-              Which habits matter to you?
+                          {% if is_edit %}
+                Edit your habits
+              {% else %}
+                Which habits matter to you?
+              {% endif %}
             </h1>
             <p class="text-emerald-100/70 text-base">
-              Pick 5 to 7 habits — these are scientifically proven to support well-being
+              {% if is_edit %}
+                Update the habits you want to track
+              {% else %}
+                Pick 5 to 7 habits — these are scientifically proven to support well-being
+              {% endif %}
             </p>
           </div>
 
           <!-- Habit Form -->
-          <form id="habitForm" action="/habits" method="POST" class="space-y-10 mb-24">
+          <form id="habitForm" action="{% if is_edit %}{{ url_for('main.edit_habits') }}{% else %}{{ url_for('main.habits') }}{% endif %}" method="POST" class="space-y-10 mb-24">
 
             <!-- Hidden input -->
             <input type="hidden" name="habits" id="habitsInput" value="">
@@ -104,7 +114,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'exercise-30')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '1')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -114,7 +124,7 @@
                   <h3 class="text-white font-bold text-base">Exercise 30 min</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'walk-8k')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '2')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -124,7 +134,7 @@
                   <h3 class="text-white font-bold text-base">Walk 8k+ steps</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'stretch-yoga')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '3')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -147,7 +157,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'sleep-7h')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '4')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -157,7 +167,7 @@
                   <h3 class="text-white font-bold text-base">Sleep 7+ hours</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'bedtime')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '5')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -167,7 +177,7 @@
                   <h3 class="text-white font-bold text-base">Consistent bedtime</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'no-screens')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '6')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -190,7 +200,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'water-2l')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '7')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -200,7 +210,7 @@
                   <h3 class="text-white font-bold text-base">Drink 2L water</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'fruits-veggies')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '8')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -210,7 +220,7 @@
                   <h3 class="text-white font-bold text-base">Eat fruits or vegetables</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'no-junk')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '9')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -233,7 +243,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'meditation')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '10')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -243,7 +253,7 @@
                   <h3 class="text-white font-bold text-base">Meditation or breathing</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'journaling')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '11')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -253,7 +263,7 @@
                   <h3 class="text-white font-bold text-base">Journaling</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'outdoors')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '12')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -276,7 +286,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'connect')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '13')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -286,7 +296,7 @@
                   <h3 class="text-white font-bold text-base">Connect with someone</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'limit-social')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '14')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -296,7 +306,7 @@
                   <h3 class="text-white font-bold text-base">Limit social media</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'help')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '15')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -319,7 +329,7 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" onclick="toggleHabit(this, 'read')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '16')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -329,7 +339,7 @@
                   <h3 class="text-white font-bold text-base">Read 20 minutes</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'learn')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '17')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -339,7 +349,7 @@
                   <h3 class="text-white font-bold text-base">Learn something new</h3>
                 </button>
 
-                <button type="button" onclick="toggleHabit(this, 'gratitude')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
+                <button type="button" onclick="toggleHabit(this, '18')" class="habit-card text-left p-5 rounded-xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 relative">
                   <div class="checkmark absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 items-center justify-center hidden">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
@@ -372,7 +382,11 @@
       <div class="fixed bottom-0 left-0 right-0 p-6 z-30" style="background: linear-gradient(to top, #022c22 0%, #022c22 60%, transparent 100%);">
         <div class="max-w-5xl mx-auto">
           <button type="button" id="continueBtn" onclick="handleContinue()" disabled class="w-full py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center justify-center gap-2 bg-white/10 text-white/30 cursor-not-allowed border border-white/10">
-            Continue
+            {% if is_edit %}
+              Save Changes
+            {% else %}
+              Continue
+            {% endif %}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" x2="19" y1="12" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -385,7 +399,7 @@
   </div>
 
   <script>
-    let selectedHabits = [];
+    let selectedHabits = {{ selected_habit_ids | default([]) | map("string") | list | tojson }};
     const minHabits = 5;
     const maxHabits = 7;
 
@@ -444,6 +458,16 @@
         document.getElementById('habitForm').submit();
       }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+  selectedHabits.forEach(habitId => {
+    const button = document.querySelector(`[onclick="toggleHabit(this, '${habitId}')"]`);
+    if (button) {
+      selectedHabits = selectedHabits.filter(id => id !== habitId);
+      toggleHabit(button, habitId);
+    }
+  });
+});
   </script>
 
 </body>

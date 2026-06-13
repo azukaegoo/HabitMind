@@ -12,28 +12,58 @@ auth_bp = Blueprint('auth', __name__)
 # ═══════════════════════════════════════════
 # SIGN UP & REGISTER
 # ═══════════════════════════════════════════
+#sign up route
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
+
+        fullname = request.form.get('fullname')
         email = request.form.get('email')
         password = request.form.get('password')
-        
+
         if User.query.filter_by(email=email).first():
-            flash('There is an existing account with that email.', 'error')
+            flash(
+                'An account with that email already exists.',
+                'error'
+            )
             return redirect(url_for('auth.register'))
-            
-        # Create and save new user
-        new_user = User(email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash('Account creation successful! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
-        
+
+        try:
+            new_user = User(
+                name=fullname,
+                email=email
+            )
+
+            new_user.set_password(password)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash(
+                'Account created successfully! Please log in.',
+                'success'
+            )
+
+            return redirect(url_for('auth.login'))
+
+        except Exception as e:
+            db.session.rollback()
+
+            print(
+                f"DEBUG: Error creating account for {email}: {e}",
+                flush=True
+            )
+
+            flash(
+                'Could not create your account. Please try again.',
+                'error'
+            )
+
+            return redirect(url_for('auth.register'))
+
     return render_template('signup.html')
 
 
@@ -53,18 +83,19 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        
+
         if user and user.check_password(password):
             login_user(user)
-            
+
             print(f"DEBUG: User logged in - Email: {user.email}, Plan: {user.plan}", flush=True)
-            print(f"DEBUG: Is user premium? -> {user.is_premium()}", flush=True)
-            
-            # If onboarding is not complete, redirect to goals
-            if not user.selected_goals:
-                return redirect(url_for('main.goals'))
-            
-            return redirect(url_for('main.dashboard'))
+
+            if not user.onboarding_completed:
+                if not user.selected_goals:
+                    return redirect(url_for("main.goals"))
+
+                return redirect(url_for("main.habits"))
+
+            return redirect(url_for("main.dashboard"))
         else:
             flash('Invalid email or password. Please try again.', 'error')
             return redirect(url_for('auth.login'))

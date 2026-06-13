@@ -11,6 +11,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 mail = Mail() 
 
+
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -44,5 +45,9 @@ def create_app(test_config=None):
 
     from .auth import auth_bp
     app.register_blueprint(auth_bp)
+
+    with app.app_context():
+        from .seed import seed_default_habits
+        seed_default_habits()
 
     return app
