@@ -5,12 +5,14 @@ import logging
 from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from itertools import combinations
-from collections import Counter
-from .models import User, CheckIn, WeeklyInsight
+from collections import Counter, defaultdict
+from .models import User, Habit, UserHabit, CheckIn, CheckInHabit, CurrentInsight
 
 logger = logging.getLogger(__name__)
 main = Blueprint("main", __name__)
+
 
 def premium_required(f):
     """Decorator to require premium plan for specific routes."""
@@ -23,6 +25,55 @@ def premium_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+# ═══════════════════════════════════════════
+# Helper functions
+# ═══════════════════════════════════════════
+def calculate_streak(user_id):
+    today = datetime.now(UTC).date()
+
+    checkins = (
+        CheckIn.query
+        .filter_by(user_id=user_id)
+        .order_by(CheckIn.date.desc())
+        .all()
+    )
+
+    streak = 0
+    expected_date = today
+
+    for checkin in checkins:
+        if checkin.date == expected_date:
+            streak += 1
+            expected_date -= timedelta(days=1)
+        else:
+            break
+
+    return streak
+
+
+def get_mood_emoji(avg_mood):
+    if avg_mood is None:
+        return "—"
+
+    rounded_mood = round(avg_mood)
+
+    mood_emojis = {
+        1: "😭",
+        2: "😰",
+        3: "😟",
+        4: "🙁",
+        5: "😐",
+        6: "🙂",
+        7: "😊",
+        8: "😄",
+        9: "😁",
+        10: "🤩",
+    }
+
+    return mood_emojis.get(rounded_mood, "😐")
+
+
 # ═══════════════════════════════════════════
 # HOME
 # ═══════════════════════════════════════════
@@ -33,27 +84,438 @@ def home():
         return redirect(url_for('main.dashboard'))
     return render_template("home.html")
 
+
+# ═══════════════════════════════════════════
+# ONBOARDING - GOALS
+# ═══════════════════════════════════════════
+@main.route("/goals", methods=["GET", "POST"])
+@login_required
+def goals():
+    """Handle onboarding Step 1: Save selected goals."""
+
+    if current_user.onboarding_completed:
+        return redirect(url_for("main.dashboard"))
+
+    if request.method == "POST":
+        selected_goals = request.form.get("goals", "")
+
+        goals_list = [
+            goal.strip()
+            for goal in selected_goals.split(",")
+            if goal.strip()
+        ]
+
+        if not goals_list:
+            return redirect(url_for("main.goals"))
+
+        current_user.selected_goals = ",".join(goals_list)
+
+        try:
+            db.session.commit()
+
+            print(
+                f"DEBUG: Goals saved for {current_user.email} -> {current_user.selected_goals}",
+                flush=True
+            )
+
+            return redirect(url_for("main.habits"))
+
+        except Exception as e:
+            db.session.rollback()
+
+            logger.exception(
+                "Error saving goals for user %s: %s",
+                current_user.email,
+                e
+            )
+
+            flash(
+                "Could not save your goal selections. Please try again.",
+                "error"
+            )
+
+            return redirect(url_for("main.goals"))
+
+    return render_template("goals.html",
+                           is_edit=False,
+                           selected_goals=[])
+
+
+# ═══════════════════════════════════════════
+# ONBOARDING - SELECT HABIT
+# ═══════════════════════════════════════════
+@main.route("/habits", methods=["GET", "POST"])
+@login_required
+def habits():
+    """Handle onboarding Step 2: Save selected habits."""
+
+    if current_user.onboarding_completed:
+        return redirect(url_for("main.dashboard"))
+
+    if request.method == "POST":
+        try:
+            selected_habits = request.form.get("habits", "")
+
+            habit_ids = [
+                int(habit_id)
+                for habit_id in selected_habits.split(",")
+                if habit_id.strip()
+            ]
+
+            if len(habit_ids) < 5 or len(habit_ids) > 7:
+                return redirect(url_for("main.habits"))
+
+            for habit_id in habit_ids:
+                user_habit = UserHabit(
+                    user_id=current_user.id,
+                    habit_id=habit_id
+                )
+                db.session.add(user_habit)
+
+            current_user.onboarding_completed = True
+
+            db.session.commit()
+
+            return redirect(url_for("main.dashboard"))
+
+        except Exception as e:
+            db.session.rollback()
+
+            logger.exception(
+                "Error saving habits for user %s: %s",
+                current_user.email,
+                e
+            )
+
+            flash(
+                "Could not save your habit selections. Please try again.",
+                "error"
+            )
+
+            return redirect(url_for("main.habits"))
+
+    all_habits = Habit.query.filter_by(
+        is_active=True
+    ).all()
+
+    habits_by_category = defaultdict(list)
+
+    for habit in all_habits:
+        habits_by_category[habit.category].append(habit)
+
+    return render_template(
+        "habits.html",
+        habits_by_category=habits_by_category,
+        is_edit=False,
+        selected_habit_ids=[]
+    )
+
+
+# ═══════════════════════════════════════════
+# DASHBOARD
+# ═══════════════════════════════════════════
+@main.route("/dashboard")
+@login_required
+def dashboard():
+    today = datetime.now(UTC).date()
+
+    today_checkin = CheckIn.query.filter_by(
+        user_id=current_user.id,
+        date=today
+    ).first()
+
+    has_checked_in_today = today_checkin is not None
+
+    # Total check-ins
+    total_checkins = CheckIn.query.filter_by(
+        user_id=current_user.id
+    ).count()
+
+    # Average mood (associated with all checkins)
+    avg_mood = (
+        db.session.query(func.avg(CheckIn.mood_score))
+        .filter(CheckIn.user_id == current_user.id)
+        .scalar()
+    )
+
+    if avg_mood is not None:
+        avg_mood = round(avg_mood, 1)
+
+    mood_emoji = get_mood_emoji(avg_mood)
+
+    # streak calculations
+    streak = calculate_streak(current_user.id)
+
+    return render_template(
+        "dashboard.html",
+        user=current_user,
+        has_checked_in_today=has_checked_in_today,
+        today_checkin=today_checkin,
+        total_checkins=total_checkins,
+        avg_mood=avg_mood,
+        mood_emoji=mood_emoji,
+        streak=streak
+    )
+
+
+# ═══════════════════════════════════════════
+# DAILY CHECK-IN
+# ═══════════════════════════════════════════
+@main.route("/check-in", methods=["GET", "POST"])
+@login_required
+def check_in():
+    today = datetime.now(UTC).date()
+
+    today_checkin = CheckIn.query.filter_by(
+        user_id=current_user.id,
+        date=today
+    ).first()
+
+    if today_checkin:
+        flash("You have already completed today's check-in.")
+        return redirect(url_for("main.dashboard"))
+
+    if request.method == "POST":
+        try:
+            mood_value = request.form.get("mood")
+            habits_done = request.form.get("habits_done", "")
+
+            if not mood_value:
+                flash("Please select your mood before saving.")
+                return redirect(url_for("main.check_in"))
+
+            checkin = CheckIn(
+                user_id=current_user.id,
+                mood_score=int(mood_value),
+                date=today
+            )
+
+            db.session.add(checkin)
+            db.session.flush()
+
+            habit_ids = [
+                int(habit_id)
+                for habit_id in habits_done.split(",")
+                if habit_id.strip()
+            ]
+
+            for habit_id in habit_ids:
+                db.session.add(
+                    CheckInHabit(
+                        checkin_id=checkin.id,
+                        habit_id=habit_id
+                    )
+                )
+
+            db.session.commit()
+
+            session["checkin_completed"] = True
+            return redirect(url_for("main.check_in_complete"))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash("You have already completed today's check-in.")
+            return redirect(url_for("main.dashboard"))
+
+        except Exception as e:
+            db.session.rollback()
+            logger.exception(
+                "Error saving check-in for user %s: %s",
+                current_user.email,
+                e
+            )
+            flash("Could not save your check-in. Please try again.")
+            return redirect(url_for("main.check_in"))
+
+    habit_s = (
+        db.session.query(Habit)
+        .join(UserHabit, UserHabit.habit_id == Habit.id)
+        .filter(UserHabit.user_id == current_user.id)
+        .all()
+    )
+
+    return render_template("check_in.html", habits=habit_s)
+
+
+@main.route("/check-in-complete")
+@login_required
+def check_in_complete():
+    if not session.pop("checkin_completed", None):
+        return redirect(url_for("main.dashboard"))
+
+    return render_template("check_in_complete.html")
+
+
+# ═══════════════════════════════════════════
+# PROFILE
+# ═══════════════════════════════════════════
+@main.route("/profile")
+@login_required
+def profile():
+    total_checkins = CheckIn.query.filter_by(user_id=current_user.id).count()
+
+    average_mood = (
+        db.session.query(func.avg(CheckIn.mood_score))
+        .filter(CheckIn.user_id == current_user.id)
+        .scalar()
+    )
+
+    if average_mood is not None:
+        average_mood = round(average_mood, 1)
+    mood_emoji = get_mood_emoji(average_mood)
+
+    selected_habits = (
+        db.session.query(Habit)
+        .join(UserHabit, UserHabit.habit_id == Habit.id)
+        .filter(UserHabit.user_id == current_user.id)
+        .all()
+    )
+
+    name_parts = current_user.name.split() if current_user.name else []
+    user_initials = "".join([part[0].upper() for part in name_parts[:2]])
+
+    if not user_initials:
+        user_initials = current_user.email[0].upper()
+
+
+    streak = calculate_streak(current_user.id)
+
+    selected_goals = (
+        current_user.selected_goals.split(",")
+        if current_user.selected_goals
+        else []
+    )
+
+    return render_template(
+        "profile.html",
+        user=current_user,
+        user_initials=user_initials,
+        total_checkins=total_checkins,
+        average_mood=average_mood,
+        selected_habits=selected_habits,
+        selected_goals=selected_goals,
+        mood_emoji=mood_emoji,
+        streak=streak
+    )
+
+
+@main.route("/edit-goals", methods=["GET", "POST"])
+@login_required
+def edit_goals():
+    if request.method == "POST":
+        try:
+            selected_goals = request.form.get("goals", "")
+
+            goals_list = [
+                goal.strip()
+                for goal in selected_goals.split(",")
+                if goal.strip()
+            ]
+
+            if not goals_list or len(goals_list) > 3:
+                return redirect(url_for("main.edit_goals"))
+
+            current_user.selected_goals = ",".join(goals_list)
+
+            # Free users only have current insight, so reset it
+            if current_user.is_free():
+                CurrentInsight.query.filter_by(user_id=current_user.id).delete()
+
+            db.session.commit()
+
+            flash("Your goals were updated successfully.", "success")
+            return redirect(url_for("main.profile"))
+
+        except Exception as e:
+            db.session.rollback()
+            logger.exception("Error updating goals for user %s: %s", current_user.email, e)
+            flash("Could not update your goals. Please try again.", "error")
+            return redirect(url_for("main.edit_goals"))
+
+    selected_goals = (
+        current_user.selected_goals.split(",")
+        if current_user.selected_goals
+        else []
+    )
+
+    return render_template("goals.html", selected_goals=selected_goals, is_edit=True)
+
+
+@main.route("/edit-habits", methods=["GET", "POST"])
+@login_required
+def edit_habits():
+    if request.method == "POST":
+        try:
+            selected_habits = request.form.get("habits", "")
+
+            habit_ids = [
+                int(habit_id)
+                for habit_id in selected_habits.split(",")
+                if habit_id.strip()
+            ]
+
+            if len(habit_ids) < 5 or len(habit_ids) > 7:
+                return redirect(url_for("main.edit_habits"))
+
+            UserHabit.query.filter_by(user_id=current_user.id).delete()
+
+            for habit_id in habit_ids:
+                db.session.add(UserHabit(user_id=current_user.id, habit_id=habit_id))
+
+            if current_user.is_free():
+                CurrentInsight.query.filter_by(user_id=current_user.id).delete()
+
+            db.session.commit()
+
+            flash("Your habits were updated successfully.", "success")
+            return redirect(url_for("main.profile"))
+
+        except Exception as e:
+            db.session.rollback()
+            logger.exception("Error updating habits for user %s: %s", current_user.email, e)
+            flash("Could not update your habits. Please try again.", "error")
+            return redirect(url_for("main.edit_habits"))
+
+    all_habits = Habit.query.filter_by(is_active=True).all()
+
+    selected_habit_ids = [
+        user_habit.habit_id
+        for user_habit in UserHabit.query.filter_by(user_id=current_user.id).all()
+    ]
+
+    return render_template(
+        "habits.html",
+        habits=all_habits,
+        selected_habit_ids=selected_habit_ids,
+        is_edit=True
+    )
+
+
+
+
+
+'''
 @main.route("/dashboard")
 @login_required
 def dashboard():
     """Render the dashboard with aggregated user statistics."""
     user_id = current_user.id
     today = datetime.now(UTC).date()
-    
+
     # 1. Calculate Today's Check-in Status
     today_checkin = CheckIn.query.filter_by(user_id=user_id, date=today).first()
     has_checked_in_today = today_checkin is not None
-    
+
     # 2. Calculate Total Check-ins
     total_checkins = CheckIn.query.filter_by(user_id=user_id).count()
-    
+
     # 3. Calculate Average Mood Score
     avg_mood_result = db.session.query(func.avg(CheckIn.mood_score)).filter_by(user_id=user_id).scalar()
     average_mood = round(avg_mood_result, 1) if avg_mood_result else 0.0
-    
+
     # 4. Calculate Current Streak (Consecutive days)
     checkins = CheckIn.query.filter_by(user_id=user_id).order_by(CheckIn.date.desc()).all()
-    
+
     current_streak = 0
     if checkins:
         first_date = checkins[0].date
@@ -108,7 +570,7 @@ def dashboard():
         flush=True)
 
     return render_template(
-        "dashboard.html", 
+        "dashboard.html",
         has_checked_in_today=has_checked_in_today,
         total_checkins=total_checkins,
         average_mood=average_mood,
@@ -427,3 +889,5 @@ def upgrade_premium():
         flash('You are already a Premium member.', 'info')
         
     return redirect(url_for('main.settings'))
+
+'''
