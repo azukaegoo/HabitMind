@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insight History — HabitMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .btn-primary { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .btn-primary:hover { transform: scale(1.01); box-shadow: 0 20px 40px rgba(21,122,92,0.25); }
+    .btn-primary:active { transform: scale(0.99); }
+    .record-card { transition: all 0.2s ease; }
+    .record-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,122,92,0.08); }
+    .view-btn { transition: all 0.2s ease; }
+    .view-btn:hover { background: #d8f3e6; }
+    .nav-item { transition: background-color 0.2s ease; }
+    select.period-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23157a5c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="min-h-screen relative overflow-hidden" style="background: #f7faf8;">
+
+  <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-40" style="background: radial-gradient(ellipse, #d8f3e6 0%, transparent 70%);"></div>
+  <div class="pointer-events-none absolute bottom-0 -right-40 w-[400px] h-[400px] rounded-full opacity-30" style="background: radial-gradient(ellipse, #a8e6c9 0%, transparent 70%);"></div>
+
+  <div class="relative z-10 min-h-screen px-4 py-8 pb-28">
+
+    <!-- HEADER -->
+    <header class="max-w-2xl mx-auto flex items-center justify-between mb-6">
+      <a href="/" class="flex items-center gap-3 no-underline">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style="background: #157a5c;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight" style="color: #157a5c;">HabitMind</span>
+      </a>
+      <button class="w-10 h-10 rounded-xl flex items-center justify-center bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </button>
+    </header>
+
+    <!-- BACK LINK -->
+    <div class="max-w-2xl mx-auto mb-4">
+      <a href="/insights" class="inline-flex items-center gap-1.5 text-sm font-medium no-underline hover:gap-2 transition-all" style="color: #157a5c;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Back to Insights
+      </a>
+    </div>
+
+    <!-- TITLE + INFO BANNER -->
+    <div class="max-w-2xl mx-auto mb-6">
+      <h1 class="text-3xl md:text-4xl font-bold mb-3" style="color: #134e3a;">Insight History</h1>
+      <div class="flex items-start gap-3 p-4 rounded-2xl border" style="background: #f3e8ff; border-color: #e9d5ff;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" x2="12" y1="8" y2="12"/>
+          <line x1="12" x2="12.01" y1="16" y2="16"/>
+        </svg>
+        <p class="text-sm" style="color: #6b21a8;">Insight reports are generated based on the check-ins within the selected period.</p>
+      </div>
+    </div>
+
+    <!-- PERIOD SELECTOR CARD -->
+    <div class="max-w-2xl mx-auto mb-6">
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5">
+        <p class="text-sm font-bold mb-3" style="color: #134e3a;">Select Period</p>
+        <form action="/insights/history" method="GET" class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="4" rx="2"/>
+                <line x1="16" x2="16" y1="2" y2="6"/>
+                <line x1="8" x2="8" y1="2" y2="6"/>
+                <line x1="3" x2="21" y1="10" y2="10"/>
+              </svg>
+            </span>
+            <select name="period" class="period-select w-full pl-11 pr-10 py-3 rounded-xl border-2 font-semibold text-sm cursor-pointer outline-none focus:border-emerald-400" style="border-color: #e8efeb; color: #157a5c; background-color: #ffffff;">
+              <option value="1m" {% if selected_period == '1m' %}selected{% endif %}>Last 1 Month</option>
+              <option value="3m" {% if selected_period == '3m' %}selected{% endif %}>Last 3 Months</option>
+              <option value="6m" {% if selected_period == '6m' %}selected{% endif %}>Last 6 Months</option>
+              <option value="1y" {% if selected_period == '1y' %}selected{% endif %}>Last 1 Year</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #1fa97a 0%, #157a5c 100%);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            View
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PAST INSIGHT RECORDS -->
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-lg font-bold mb-4" style="color: #134e3a;">Past Insight Records</h2>
+
+      <div class="space-y-3">
+        {% for record in records %}
+        <div class="record-card rounded-2xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: #d8f3e6;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-base" style="color: #134e3a;">{{ record.date_range }}</p>
+            <p class="text-xs mt-0.5" style="color: #5b8a76;">{{ record.days }} days</p>
+          </div>
+          <a href="/insights?period={{ record.id }}" class="view-btn inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 font-semibold text-sm no-underline flex-shrink-0" style="border-color: #d8f3e6; color: #157a5c; background: #ffffff;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            View Full Report
+          </a>
+        </div>
+        {% else %}
+        <!-- Empty state for new users -->
+        <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-10 text-center">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background: #d8f3e6;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+          </div>
+          <p class="font-bold text-base mb-1" style="color: #134e3a;">No insight history yet</p>
+          <p class="text-sm" style="color: #5b8a76;">Keep checking in! Your monthly reports will appear here.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
+    <div class="max-w-2xl mx-auto flex items-center justify-around">
+      <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Dashboard</span>
+      </a>
+      <a href="/check-in" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Check-in</span>
+      </a>
+      <a href="/insights" class="nav-item flex flex-col items-center gap-1 px-3 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+        <span class="text-xs font-bold" style="color: #157a5c;">Insights</span>
+      </a>
+      <a href="/profile" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Profile</span>
+      </a>
+      <a href="/logout" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span class="text-xs font-medium" style="color: #dc2626;">Logout</span>
+    </a>
+    </div>
+  </nav>
+
+</div>
+
+</body>
+</html>

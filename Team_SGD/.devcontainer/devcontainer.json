@@ -1,0 +1,21 @@
+{
+  "name": "One Button App",
+  "image": "python:3.12-bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [5000, 5432],
+
+  "initializeCommand": "[ -f .env ] || cp .env_sample .env",
+
+  "postCreateCommand": "npm install",
+
+  "postStartCommand": "docker compose up --build -d",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  }
+}

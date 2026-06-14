@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitMind - Choose Your Goals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%);">
+
+    <!-- Ambient glow blobs -->
+    <div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20" style="background: radial-gradient(ellipse, #34d399 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute bottom-0 -right-40 w-[500px] h-[500px] rounded-full opacity-10" style="background: radial-gradient(ellipse, #10b981 0%, transparent 70%);"></div>
+    <div class="pointer-events-none absolute top-1/2 -left-32 w-[400px] h-[400px] rounded-full opacity-10" style="background: radial-gradient(ellipse, #059669 0%, transparent 70%);"></div>
+
+    <!-- Subtle grid overlay -->
+    <div class="pointer-events-none absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 64px 64px;"></div>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+      <!-- Header -->
+      <header class="px-6 pt-6 pb-2 flex items-center justify-between max-w-3xl mx-auto w-full">
+        <a href="/" class="flex items-center gap-3 no-underline">
+          <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+              <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+              <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+              <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+              <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>
+              <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+              <path d="M19.938 10.5a4 4 0 0 1 .585.396"/>
+              <path d="M6 18a4 4 0 0 1-1.967-.516"/>
+              <path d="M19.967 17.484A4 4 0 0 1 18 18"/>
+            </svg>
+          </div>
+          <span class="text-white font-bold text-lg tracking-tight">HabitMind</span>
+        </a>
+        <a href="/signup" class="text-emerald-300 hover:text-white text-sm font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/10">
+          Back
+        </a>
+      </header>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col items-center px-4 py-8 md:py-12">
+        <form id="goalsForm" action="/goals" method="POST" class="w-full max-w-2xl mx-auto">
+
+          <!-- Progress Indicator -->
+          <div class="mb-10 text-center">
+            <p class="text-emerald-300/70 text-sm font-medium mb-4">Step 1 of 3</p>
+            <div class="flex gap-2 justify-center">
+              <div class="h-1.5 w-16 rounded-full bg-emerald-400"></div>
+              <div class="h-1.5 w-16 rounded-full bg-white/20"></div>
+              <div class="h-1.5 w-16 rounded-full bg-white/20"></div>
+            </div>
+          </div>
+
+          <!-- Heading -->
+          <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+              What brings you to HabitMind?
+            </h1>
+            <p class="text-emerald-100/70 text-base">
+              Choose up to 3 goals — we'll personalize your experience
+            </p>
+          </div>
+
+          <!-- Hidden inputs to store selected goals -->
+          <input type="hidden" name="goals" id="goalsInput" value="">
+
+          <!-- Goal Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+            <!-- Goal 1: Sleep better -->
+            <button type="button" onclick="toggleGoal(this, 'sleep')" class="goal-card relative group text-left p-6 rounded-2xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 hover:border-white/20">
+              <div class="checkmark absolute top-4 right-4 w-6 h-6 rounded-full bg-emerald-400 items-center justify-center hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="goal-icon w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-200/70">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                  <h3 class="text-white font-bold text-lg mb-1">Sleep better</h3>
+                  <p class="text-emerald-100/60 text-sm leading-relaxed">Build a calmer evening routine</p>
+                </div>
+              </div>
+            </button>
+
+            <!-- Goal 2: Manage stress -->
+            <button type="button" onclick="toggleGoal(this, 'stress')" class="goal-card relative group text-left p-6 rounded-2xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 hover:border-white/20">
+              <div class="checkmark absolute top-4 right-4 w-6 h-6 rounded-full bg-emerald-400 items-center justify-center hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="goal-icon w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-200/70">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                  <h3 class="text-white font-bold text-lg mb-1">Manage stress</h3>
+                  <p class="text-emerald-100/60 text-sm leading-relaxed">Find more peace in your day</p>
+                </div>
+              </div>
+            </button>
+
+            <!-- Goal 3: Build healthy habits -->
+            <button type="button" onclick="toggleGoal(this, 'habits')" class="goal-card relative group text-left p-6 rounded-2xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 hover:border-white/20">
+              <div class="checkmark absolute top-4 right-4 w-6 h-6 rounded-full bg-emerald-400 items-center justify-center hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="goal-icon w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-200/70">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="6"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                  </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                  <h3 class="text-white font-bold text-lg mb-1">Build healthy habits</h3>
+                  <p class="text-emerald-100/60 text-sm leading-relaxed">Small steps that add up</p>
+                </div>
+              </div>
+            </button>
+
+            <!-- Goal 4: Boost my mood -->
+            <button type="button" onclick="toggleGoal(this, 'mood')" class="goal-card relative group text-left p-6 rounded-2xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 hover:border-white/20">
+              <div class="checkmark absolute top-4 right-4 w-6 h-6 rounded-full bg-emerald-400 items-center justify-center hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="goal-icon w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-200/70">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" x2="9.01" y1="9" y2="9"></line>
+                    <line x1="15" x2="15.01" y1="9" y2="9"></line>
+                  </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                  <h3 class="text-white font-bold text-lg mb-1">Boost my mood</h3>
+                  <p class="text-emerald-100/60 text-sm leading-relaxed">Feel lighter and more positive</p>
+                </div>
+              </div>
+            </button>
+
+            <!-- Goal 5: Stay consistent (full width) -->
+            <button type="button" onclick="toggleGoal(this, 'consistency')" class="goal-card relative group text-left p-6 rounded-2xl border bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/8 hover:border-white/20 md:col-span-2">
+              <div class="checkmark absolute top-4 right-4 w-6 h-6 rounded-full bg-emerald-400 items-center justify-center hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="goal-icon w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/10 border border-white/20">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-200/70">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                    <line x1="16" x2="16" y1="2" y2="6"></line>
+                    <line x1="8" x2="8" y1="2" y2="6"></line>
+                    <line x1="3" x2="21" y1="10" y2="10"></line>
+                  </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                  <h3 class="text-white font-bold text-lg mb-1">Stay consistent</h3>
+                  <p class="text-emerald-100/60 text-sm leading-relaxed">Show up for yourself every day</p>
+                </div>
+              </div>
+            </button>
+
+          </div>
+
+          <!-- Max selection message (hidden by default) -->
+          <div id="maxMessage" class="text-center mb-4 hidden">
+            <p class="text-amber-300 text-sm font-medium">Choose up to 3 goals maximum</p>
+          </div>
+
+          <!-- Continue Button -->
+          <button type="submit" id="continueBtn" disabled class="w-full py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center justify-center gap-2 bg-white/10 text-white/30 cursor-not-allowed border border-white/10">
+            Continue
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" x2="19" y1="12" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+
+        </form>
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedGoals = [];
+    const maxGoals = 3;
+
+    function toggleGoal(button, goalId) {
+      const checkmark = button.querySelector('.checkmark');
+      const icon = button.querySelector('.goal-icon');
+      const isSelected = selectedGoals.includes(goalId);
+
+      if (isSelected) {
+        // Deselect
+        selectedGoals = selectedGoals.filter(id => id !== goalId);
+        button.classList.remove('bg-white/10', 'border-emerald-400', 'shadow-lg', 'shadow-emerald-400/20');
+        button.classList.add('bg-white/5', 'border-white/10');
+        checkmark.classList.add('hidden');
+        checkmark.classList.remove('flex');
+        icon.classList.remove('bg-emerald-500/20', 'border-emerald-400/40');
+        icon.classList.add('bg-white/10', 'border-white/20');
+        icon.querySelector('svg').classList.remove('text-emerald-300');
+        icon.querySelector('svg').classList.add('text-emerald-200/70');
+        document.getElementById('maxMessage').classList.add('hidden');
+      } else {
+        // Try to select
+        if (selectedGoals.length >= maxGoals) {
+          const maxMsg = document.getElementById('maxMessage');
+          maxMsg.classList.remove('hidden');
+          setTimeout(() => { maxMsg.classList.add('hidden'); }, 2000);
+          return;
+        }
+        selectedGoals.push(goalId);
+        button.classList.remove('bg-white/5', 'border-white/10');
+        button.classList.add('bg-white/10', 'border-emerald-400', 'shadow-lg', 'shadow-emerald-400/20');
+        checkmark.classList.remove('hidden');
+        checkmark.classList.add('flex');
+        icon.classList.remove('bg-white/10', 'border-white/20');
+        icon.classList.add('bg-emerald-500/20', 'border-emerald-400/40');
+        icon.querySelector('svg').classList.remove('text-emerald-200/70');
+        icon.querySelector('svg').classList.add('text-emerald-300');
+      }
+
+      updateContinueButton();
+      document.getElementById('goalsInput').value = selectedGoals.join(',');
+    }
+
+    function updateContinueButton() {
+      const continueBtn = document.getElementById('continueBtn');
+      if (selectedGoals.length > 0) {
+        continueBtn.disabled = false;
+        continueBtn.classList.remove('bg-white/10', 'text-white/30', 'cursor-not-allowed', 'border', 'border-white/10');
+        continueBtn.classList.add('text-emerald-900', 'shadow-xl', 'hover:shadow-2xl', 'hover:shadow-emerald-400/20', 'hover:scale-[1.02]', 'active:scale-[0.98]');
+        continueBtn.style.background = 'linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%)';
+      } else {
+        continueBtn.disabled = true;
+        continueBtn.classList.add('bg-white/10', 'text-white/30', 'cursor-not-allowed', 'border', 'border-white/10');
+        continueBtn.classList.remove('text-emerald-900', 'shadow-xl', 'hover:shadow-2xl', 'hover:shadow-emerald-400/20', 'hover:scale-[1.02]', 'active:scale-[0.98]');
+        continueBtn.style.background = '';
+      }
+    }
+  </script>
+
+</body>
+</html>

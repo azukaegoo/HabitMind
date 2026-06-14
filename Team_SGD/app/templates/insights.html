@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insights — HabitMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .btn-primary { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .btn-primary:hover { transform: scale(1.01); box-shadow: 0 20px 40px rgba(124,58,237,0.25); }
+    .btn-primary:active { transform: scale(0.99); }
+    .nav-item { transition: background-color 0.2s ease; }
+  </style>
+</head>
+<body>
+<div class="min-h-screen relative overflow-hidden" style="background: #f7faf8;">
+  <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-40" style="background: radial-gradient(ellipse, #d8f3e6 0%, transparent 70%);"></div>
+  <div class="pointer-events-none absolute bottom-0 -right-40 w-[400px] h-[400px] rounded-full opacity-30" style="background: radial-gradient(ellipse, #a8e6c9 0%, transparent 70%);"></div>
+
+  <div class="relative z-10 min-h-screen px-4 py-8 pb-28">
+
+    <!-- HEADER -->
+    <header class="max-w-2xl mx-auto flex items-center justify-between mb-6">
+      <a href="/" class="flex items-center gap-3 no-underline">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style="background: #157a5c;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+          </svg>
+        </div>
+        <span class="font-bold text-lg tracking-tight" style="color: #157a5c;">HabitMind</span>
+      </a>
+    </header>
+
+    <!-- TITLE -->
+    <div class="max-w-2xl mx-auto mb-6 flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-1" style="color: #134e3a;">Insights</h1>
+        <p class="text-sm" style="color: #5b8a76;">Understand how your habits influence your mood.</p>
+      </div>
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-100 shadow-sm flex-shrink-0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
+        </svg>
+        <p class="text-xs font-semibold whitespace-nowrap" style="color: #157a5c;">{{ date_range if date_range else 'Last 7 days' }}</p>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="max-w-2xl mx-auto mb-5 grid grid-cols-2 gap-4">
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 text-center">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #f3e8ff;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>
+          </svg>
+        </div>
+        <p class="text-xs font-semibold mb-1" style="color: #5b8a76;">Check-in Completed</p>
+        <p class="text-3xl font-bold mb-2" style="color: #134e3a;">{{ checkin_done if checkin_done else 0 }} <span class="text-base font-medium" style="color: #5b8a76;">/ {{ checkin_total if checkin_total else 7 }}</span></p>
+        <p class="text-xs leading-snug" style="color: #8aa89b;">
+          {% if checkin_done and checkin_total and checkin_done >= checkin_total %}Great job! You've completed all check-ins for this period.{% else %}Keep checking in to complete the period.{% endif %}
+        </p>
+      </div>
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 text-center">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #d8f3e6;"><span class="text-2xl">😊</span></div>
+        <p class="text-xs font-semibold mb-1" style="color: #5b8a76;">Average Mood</p>
+        <p class="text-3xl font-bold mb-2" style="color: #134e3a;">{{ avg_mood if avg_mood else '—' }} <span class="text-base font-medium" style="color: #5b8a76;">/ 10</span></p>
+        <p class="text-xs leading-snug" style="color: #8aa89b;">Based on your completed check-ins</p>
+      </div>
+    </div>
+
+    <!-- TOP HABITS -->
+    <div class="max-w-2xl mx-auto mb-5">
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
+        <h2 class="text-base font-bold mb-5" style="color: #134e3a;">Top Habits</h2>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          {% for habit in top_habits %}
+          <div class="text-center">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2" style="background: #d8f3e6;"><span class="text-2xl">{{ habit.emoji if habit.emoji else '✨' }}</span></div>
+            <p class="text-sm font-semibold" style="color: #134e3a;">{{ habit.name }}</p>
+          </div>
+          {% else %}
+          <div class="text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2" style="background: #d8f3e6;"><span class="text-2xl">🛏️</span></div><p class="text-sm font-semibold" style="color: #134e3a;">Healthy Sleep</p></div>
+          <div class="text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2" style="background: #d8f3e6;"><span class="text-2xl">🏃</span></div><p class="text-sm font-semibold" style="color: #134e3a;">Physical Activity</p></div>
+          <div class="text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2" style="background: #d8f3e6;"><span class="text-2xl">👥</span></div><p class="text-sm font-semibold" style="color: #134e3a;">Social Connection</p></div>
+          {% endfor %}
+        </div>
+        <p class="text-center text-xs" style="color: #5b8a76;">Most frequently associated with your higher mood check-ins.</p>
+      </div>
+    </div>
+
+    <!-- WHAT WE NOTICED -->
+    <div class="max-w-2xl mx-auto mb-5">
+      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
+        <h2 class="text-base font-bold mb-1" style="color: #134e3a;">What We Noticed</h2>
+        <p class="text-xs mb-5" style="color: #5b8a76;">Patterns found from your habits and mood.</p>
+        <div class="flex gap-4">
+          <div class="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0" style="background: #d8f3e6;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1fa97a" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <ul class="flex-1 space-y-2.5">
+            {% for note in noticed_patterns %}
+            <li class="flex items-start gap-2 text-sm" style="color: #134e3a;">
+              <svg width="16" height="16" viewBox="0 0 24 24" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10" fill="#1fa97a"/><polyline points="9 12 11 14 15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              <span>{{ note|safe }}</span>
+            </li>
+            {% else %}
+            <li class="flex items-start gap-2 text-sm" style="color: #134e3a;">
+              <svg width="16" height="16" viewBox="0 0 24 24" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10" fill="#1fa97a"/><polyline points="9 12 11 14 15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              <span>Your patterns will appear here after a few check-ins.</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFLECTION + RECOMMENDED NEAR YOU (side-by-side, both premium) -->
+    <div class="max-w-2xl mx-auto mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Reflection card -->
+      <div class="rounded-2xl border border-gray-100 shadow-sm p-5" style="background: {% if is_premium %}#ffffff{% else %}#f5f0fc{% endif %};">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold" style="color: #134e3a;">Reflection</h3>
+          {% if not is_premium %}
+          <span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full" style="background: #ede9fe; color: #6d28d9;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Premium
+          </span>
+          {% endif %}
+        </div>
+        {% if is_premium and reflection %}
+          <div class="text-2xl mb-2" style="color: #7c3aed;">"</div>
+          <p class="text-sm leading-relaxed mb-2" style="color: #134e3a;">{{ reflection.text|safe }}</p>
+        {% else %}
+          <div class="text-center py-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2"/><path d="M12 19v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <p class="font-bold text-sm mb-1" style="color: #134e3a;">Personalized Reflection</p>
+            <p class="text-xs" style="color: #5b8a76;">Get reflections tailored to your progress and delivered in your preferred tone.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Recommended Near You card -->
+      <div class="rounded-2xl border border-gray-100 shadow-sm p-5" style="background: {% if is_premium %}#ffffff{% else %}#f5f0fc{% endif %};">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold" style="color: #134e3a;">Recommended Near You</h3>
+          {% if not is_premium %}
+          <span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full" style="background: #ede9fe; color: #6d28d9;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Premium
+          </span>
+          {% endif %}
+        </div>
+        {% if is_premium and recommendations %}
+          <p class="text-xs mb-3" style="color: #5b8a76;">Activities that can support your well-being.</p>
+          <div class="space-y-3">
+            {% for rec in recommendations %}
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center" style="background: #d8f3e6;"><span class="text-xl">{{ rec.emoji if rec.emoji else '✨' }}</span></div>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-sm truncate" style="color: #134e3a;">{{ rec.title }}</p>
+                <p class="text-xs" style="color: #5b8a76;">{{ rec.subtitle }}</p>
+              </div>
+              {% if rec.tag %}<span class="text-xs font-medium px-2 py-1 rounded-full" style="background: #fef3c7; color: #b45309;">{{ rec.tag }}</span>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <a href="#" class="block text-center mt-4 text-sm font-semibold" style="color: #7c3aed;">View more activities →</a>
+        {% else %}
+          <div class="text-center py-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <p class="font-bold text-sm mb-1" style="color: #134e3a;">Recommended Near You</p>
+            <p class="text-xs" style="color: #5b8a76;">See activities near you that are aligned with your habits and mood patterns.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- UPGRADE BUTTON (free users only) -->
+    {% if not is_premium %}
+    <div class="max-w-2xl mx-auto mb-5">
+      <a href="/settings?open=reflection" class="btn-primary w-full inline-flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white text-sm shadow-lg no-underline" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Upgrade to Premium to unlock personalized reflection and recommendations
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- TIP CARD -->
+    <div class="max-w-2xl mx-auto mb-5">
+      <div class="rounded-2xl border p-4 flex items-center gap-3" style="background: #f0fdf4; border-color: #d8f3e6;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1fa97a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        <div class="flex-1">
+          <p class="font-bold text-sm" style="color: #134e3a;">Tip</p>
+          <p class="text-xs" style="color: #5b8a76;">Small, consistent steps lead to meaningful change. You're doing great!</p>
+        </div>
+        <span class="text-2xl flex-shrink-0">🌱</span>
+      </div>
+    </div>
+
+    <!-- VIEW HISTORY -->
+    <div class="max-w-2xl mx-auto text-center mb-5">
+      <a href="/insights/history" class="inline-flex items-center gap-1.5 text-sm font-semibold no-underline hover:gap-2 transition-all" style="color: #157a5c;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        View Insight History
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
+    <div class="max-w-2xl mx-auto flex items-center justify-around">
+      <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Dashboard</span>
+      </a>
+      <a href="/checkin" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Check-in</span>
+      </a>
+      <a href="/insights" class="nav-item flex flex-col items-center gap-1 px-2 py-2 rounded-xl no-underline" style="background: #d8f3e6;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#157a5c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+        <span class="text-xs font-bold" style="color: #157a5c;">Insights</span>
+      </a>
+      <a href="/profile" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        <span class="text-xs font-medium" style="color: #8aa89b;">Profile</span>
+      </a>
+      <a href="/logout" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span class="text-xs font-medium" style="color: #dc2626;">Logout</span>
+      </a>
+    </div>
+  </nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.idea/
+migrations/__pycache__/
+node_modules/

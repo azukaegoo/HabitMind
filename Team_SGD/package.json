@@ -1,0 +1,19 @@
+{
+  "name": "dpd_team_sgd",
+  "version": "1.0.0",
+  "description": "A simple Flask-based web application .  \r The app demonstrates a minimal full-stack setup where a single button click is stored in a PostgreSQL database.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}
