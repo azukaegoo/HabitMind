@@ -12,6 +12,8 @@
 </head>
 <body>
 
+{% include "components/flash_messages.html" %}
+
 <div class="min-h-screen relative overflow-hidden" style="background: #f7faf8;">
 
   <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-40" style="background: radial-gradient(ellipse, #d8f3e6 0%, transparent 70%);"></div>
@@ -113,7 +115,7 @@
 
 </div>
     {% set count = total_checkins %}
-    {% if count < 5 %}
+{% if not can_view_insights %}
       <div class="max-w-2xl mx-auto mb-5">
         <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
           <div class="flex items-center gap-2 mb-3">
@@ -147,18 +149,20 @@
       </div>
     {% endif %}
 
-    <div class="max-w-2xl mx-auto mb-5">
-      <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      {% if not current_user.is_premium() %}
+      <div class="max-w-2xl mx-auto mb-5">
+        <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: #f3e8ff;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h2 class="text-lg font-bold" style="color: #134e3a;">Personalized Recommendations</h2>
+            <span class="text-xs font-bold ml-auto px-2 py-1 rounded-full" style="background: #f3e8ff; color: #7c3aed;">PREMIUM</span>
           </div>
-          <h2 class="text-lg font-bold" style="color: #134e3a;">Personalized Recommendations</h2>
-          <span class="text-xs font-bold ml-auto px-2 py-1 rounded-full" style="background: #f3e8ff; color: #7c3aed;">PREMIUM</span>
+          <p class="text-sm" style="color: #5b8a76;">Get personalized tone analysis and tailored activity recommendations — unlock with Premium.</p>
         </div>
-        <p class="text-sm" style="color: #5b8a76;">Get personalized tone analysis and tailored activity recommendations — unlock with Premium.</p>
       </div>
-    </div>
+      {% endif %}
 
   </div>
 
