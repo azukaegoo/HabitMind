@@ -82,8 +82,6 @@ class CheckIn(db.Model):
         nullable=False
     )
 
-    note = db.Column(db.Text, nullable=True)
-
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
@@ -192,6 +190,10 @@ class PremiumInsight(db.Model):
 
     recommendations_json = db.Column(db.Text, nullable=True)
     recommendation_source = db.Column(db.String(30), nullable=True)
+
+    location_latitude = db.Column(db.Float, nullable=True)
+    location_longitude = db.Column(db.Float, nullable=True)
+    location_label = db.Column(db.String(120), nullable=True)
 
     created_at = db.Column(
         db.DateTime(timezone=True),

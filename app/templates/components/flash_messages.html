@@ -1,0 +1,47 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div
+      id="flash-container"
+      class="fixed bottom-24 right-4 z-50 w-[320px] space-y-2"
+    >
+      {% for category, message in messages %}
+        <div
+          class="flash-message rounded-xl px-4 py-3 text-sm font-medium shadow-lg"
+          style="background:#ede9fe; color:#6d28d9;"
+        >
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<script>
+setTimeout(() => {
+
+    const flashContainer =
+        document.getElementById("flash-container");
+
+    document.querySelectorAll(".flash-message")
+        .forEach(msg => {
+
+            msg.style.transition =
+                "opacity .4s ease";
+
+            msg.style.opacity = "0";
+
+            setTimeout(() => {
+                msg.remove();
+
+                if (
+                    flashContainer &&
+                    flashContainer.children.length === 0
+                ) {
+                    flashContainer.remove();
+                }
+
+            }, 400);
+        });
+
+}, 5000);
+</script>

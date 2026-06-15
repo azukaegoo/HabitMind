@@ -1,0 +1,70 @@
+{
+  "supportive": {
+    "prefixes": [
+      "You're doing well.",
+      "This is a positive step.",
+      "Keep going — your effort matters.",
+      "Small consistent actions can make a difference.",
+      "It's great to see you building healthy habits.",
+      "You're making progress one step at a time.",
+      "Every habit completed is something worth celebrating.",
+      "You're creating a foundation for long-term wellbeing."
+    ],
+    "suffixes": [
+      "Keep building on this gently.",
+      "You can continue at a pace that feels manageable.",
+      "This is something worth continuing.",
+      "Progress can come from small repeated steps.",
+      "Consistency matters more than perfection.",
+      "Even small improvements can add up over time.",
+      "Keep focusing on what is working for you.",
+      "You're moving in a positive direction."
+    ]
+  },
+
+  "balanced": {
+    "prefixes": [
+      "Based on your recent check-ins,",
+      "Your recent activity suggests that",
+      "Looking at your habit patterns,",
+      "This week's data indicates that",
+      "Your check-ins show that",
+      "From your recent entries,",
+      "Your recorded habits suggest that",
+      "Recent patterns indicate that"
+    ],
+    "suffixes": [
+      "This pattern may be worth continuing to observe.",
+      "Tracking this over time may reveal stronger trends.",
+      "Additional check-ins can help confirm this pattern.",
+      "This observation is based on your recent data.",
+      "The relationship may become clearer with more tracking.",
+      "Consistency may help strengthen this pattern.",
+      "Consider monitoring whether this continues in future weeks.",
+      "Further tracking may provide additional insight."
+    ]
+  },
+
+  "challenge": {
+    "prefixes": [
+      "Can you build on this next week?",
+      "Try to notice whether this pattern continues.",
+      "Consider making this habit more consistent.",
+      "What small step could help you improve this further?",
+      "Can you raise the bar slightly next week?",
+      "Think about how you can strengthen this habit.",
+      "What would happen if you doubled down on this habit?",
+      "Is there a way to make this habit easier to maintain?"
+    ],
+    "suffixes": [
+      "Try repeating this habit in the next check-in period.",
+      "This could be a useful habit to focus on next.",
+      "Consider setting a small goal around this habit.",
+      "See if you can keep this pattern going.",
+      "Challenge yourself to stay consistent for another week.",
+      "Pay attention to whether this continues affecting your mood.",
+      "Use this insight to guide your next steps.",
+      "See if improving this habit changes your results further."
+    ]
+  }
+}
