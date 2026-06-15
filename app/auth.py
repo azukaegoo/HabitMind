@@ -12,6 +12,7 @@ auth_bp = Blueprint('auth', __name__)
 # ═══════════════════════════════════════════
 # SIGN UP & REGISTER
 # ═══════════════════════════════════════════
+#sign up route
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -65,10 +66,10 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        
+
         if user and user.check_password(password):
             login_user(user)
-            
+
             print(f"DEBUG: User logged in - Email: {user.email}, Plan: {user.plan}", flush=True)
             
             if not user.onboarding_completed:

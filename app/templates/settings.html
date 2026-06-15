@@ -25,6 +25,7 @@
   </style>
 </head>
 <body>
+<<<<<<< HEAD
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
@@ -52,6 +53,9 @@
       </div>
     {% endif %}
   {% endwith %}
+=======
+{% include "components/flash_messages.html" %}
+>>>>>>> eef2da239fc9d99b6046eb29baeb5f81ec6e3d52
 
 <div class="min-h-screen relative overflow-hidden" style="background: #f7faf8;">
 
@@ -143,19 +147,19 @@
           </div>
           <div class="flex-1 min-w-0 flex items-center gap-2">
             <p class="font-bold text-base" style="color: #134e3a;">Personalized Reflection</p>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background: #ede9fe; color: #6d28d9;">Premium</span>
           </div>
+          <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background: #ede9fe; color: #6d28d9;">Premium</span>
           <svg id="chevron-reflection" class="chevron flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
 
         <div id="content-reflection" class="accordion-content px-5 pb-5">
-          {% if current_user and current_user.is_authenticated and current_user.plan == 'premium' %}
+          {% if current_user.is_premium() %}
             <div class="rounded-xl border border-gray-100 p-5">
               <p class="font-semibold text-sm mb-1" style="color: #134e3a;">Preferred Tone</p>
               <p class="text-xs mb-4" style="color: #5b8a76;">Reflections will be written in the tone you choose.</p>
 
               <form action="/settings/update-tone" method="POST" class="space-y-3">
-                <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if current_user.ai_tone == 'supportive' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if current_user.ai_tone == 'supportive' %}#f5f3ff{% else %}#ffffff{% endif %};">
+                <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if current_user.reflection_tone == 'supportive' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if current_user.reflection_tone == 'supportive' %}#f5f3ff{% else %}#ffffff{% endif %};">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #d8f3e6;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1fa97a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                   </div>
@@ -163,10 +167,10 @@
                     <p class="font-bold text-sm" style="color: #134e3a;">Supportive</p>
                     <p class="text-xs leading-snug" style="color: #5b8a76;">Warm and encouraging reflections that offer comfort and motivation.</p>
                   </div>
-                  <input type="radio" name="tone" value="supportive" {% if current_user.ai_tone == 'supportive' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
+                  <input type="radio" name="tone" value="supportive" {% if current_user.reflection_tone == 'supportive' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
                 </label>
 
-                <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if not current_user.ai_tone or current_user.ai_tone == 'balanced' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if not current_user.ai_tone or current_user.ai_tone == 'balanced' %}#f5f3ff{% else %}#ffffff{% endif %};">
+                <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if not current_user.reflection_tone or current_user.reflection_tone == 'balanced' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if not current_user.reflection_tone or current_user.reflection_tone == 'balanced' %}#f5f3ff{% else %}#ffffff{% endif %};">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #ede9fe;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M8 21h8"/><circle cx="5" cy="8" r="2"/><circle cx="19" cy="8" r="2"/></svg>
                   </div>
@@ -174,10 +178,10 @@
                     <p class="font-bold text-sm" style="color: #134e3a;">Balanced</p>
                     <p class="text-xs leading-snug" style="color: #5b8a76;">Thoughtful and honest reflections that highlight both strengths and areas to grow.</p>
                   </div>
-                  <input type="radio" name="tone" value="balanced" {% if not current_user.ai_tone or current_user.ai_tone == 'balanced' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
+                  <input type="radio" name="tone" value="balanced" {% if not current_user.reflection_tone or current_user.reflection_tone == 'balanced' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
                 </label>
 
-                <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if current_user.ai_tone == 'challenge' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if current_user.ai_tone == 'challenge' %}#f5f3ff{% else %}#ffffff{% endif %};">
+            <label class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer" style="border-color: {% if current_user.reflection_tone == 'challenge' %}#7c3aed{% else %}#e8efeb{% endif %}; background: {% if current_user.reflection_tone == 'challenge' %}#f5f3ff{% else %}#ffffff{% endif %};">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #fef3c7;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 0L4 14h6l-1 10 9-14h-6z"/></svg>
                   </div>
@@ -185,7 +189,7 @@
                     <p class="font-bold text-sm" style="color: #134e3a;">Challenge Me</p>
                     <p class="text-xs leading-snug" style="color: #5b8a76;">Straightforward and motivating reflections that push you to grow and improve.</p>
                   </div>
-                  <input type="radio" name="tone" value="challenge" {% if current_user.ai_tone == 'challenge' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
+                  <input type="radio" name="tone" value="challenge" {% if current_user.reflection_tone == 'challenge' %}checked{% endif %} class="w-5 h-5 flex-shrink-0 accent-purple-600">
                 </label>
 
                 <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: #f5f3ff;">
@@ -208,7 +212,7 @@
               </div>
               <p class="font-bold text-base mb-2" style="color: #134e3a;">This feature is available in Premium</p>
               <p class="text-sm mb-5 max-w-sm mx-auto" style="color: #5b8a76;">Choose a tone for your personalized reflections and get deeper, more tailored insights.</p>
-              <button onclick="openUpgradeModal()" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+              <button onclick="openReflectionUpgradeModal()" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>
                 </svg>
@@ -234,10 +238,12 @@
             <p class="font-bold text-base" style="color: #134e3a;">Data</p>
             <p class="text-xs" style="color: #5b8a76;">Manage and export your data.</p>
           </div>
+           <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background: #ede9fe; color: #6d28d9;">Premium</span>
           <svg id="chevron-data" class="chevron flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
 
         <div id="content-data" class="accordion-content px-5 pb-5">
+          {% if current_user.is_premium() %}
           <div class="rounded-xl border border-gray-100 p-5">
             <p class="font-semibold text-sm mb-1" style="color: #134e3a;">Export My Data</p>
             <p class="text-xs mb-4" style="color: #5b8a76;">Download a copy of your data anytime.</p>
@@ -262,10 +268,6 @@
               <p class="text-xs font-semibold mb-2" style="color: #134e3a;">Format</p>
               <div class="flex gap-4 mb-4">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="format" value="pdf" checked class="w-4 h-4 accent-purple-600">
-                  <span class="text-sm" style="color: #134e3a;">PDF</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="format" value="csv" class="w-4 h-4 accent-purple-600">
                   <span class="text-sm" style="color: #134e3a;">CSV</span>
                 </label>
@@ -280,7 +282,25 @@
                 Export Data
               </button>
             </form>
-          </div>
+
+            {% else %}
+                      <div class="rounded-xl text-center py-8 px-5" style="background: #f5f3ff;">
+              <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style="background: #ede9fe;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <p class="font-bold text-base mb-2" style="color: #134e3a;">This feature is available in Premium</p>
+              <p class="text-sm mb-5 max-w-sm mx-auto" style="color: #5b8a76;">Export Your data.</p>
+              <button onclick="openDataUpgradeModal()" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>
+                </svg>
+                Upgrade to Premium
+              </button>
+            </div>
+             {% endif %}
         </div>
       </div>
     </div>
@@ -316,6 +336,21 @@
             </div>
           </div>
 
+          <!-- NEW: Cancel Premium (only shown for premium users) -->
+          {% if current_user and current_user.is_authenticated and current_user.plan == 'premium' %}
+          <div class="flex items-start gap-3 pb-4 mb-4 border-b" style="border-color: #e5e7eb;">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <p class="font-bold text-sm" style="color: #134e3a;">Cancel Premium Subscription</p>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background: #ede9fe; color: #6d28d9;">Premium</span>
+              </div>
+              <p class="text-xs" style="color: #5b8a76;">Downgrade to the free plan. Your stored recommendation activity, reflection history, and insight data will be permanently removed.</p>
+            </div>
+            <button type="button" onclick="openDowngradeModal()" class="danger-btn px-4 py-2 rounded-lg font-semibold text-sm border flex-shrink-0" style="color: #dc2626; border-color: #fecaca; background: #ffffff;">Cancel Premium</button>
+          </div>
+          {% endif %}
+
+          <!-- Delete Account -->
           <div class="flex items-start gap-3 pb-4 mb-4 border-b" style="border-color: #e5e7eb;">
             <div class="flex-1">
               <p class="font-bold text-sm mb-1" style="color: #134e3a;">Delete Account</p>
@@ -326,6 +361,7 @@
             </form>
           </div>
 
+          <!-- Clear History -->
           <div class="flex items-start gap-3">
             <div class="flex-1">
               <p class="font-bold text-sm mb-1" style="color: #134e3a;">Clear Check-In History</p>
@@ -353,32 +389,95 @@
   </div>
 
   <!-- UPGRADE MODAL -->
-  <div id="upgradeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
+<div id="reflectionUpgradeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <div class="text-center mb-5">
+      <h2 class="text-xl font-bold mb-2" style="color: #134e3a;">Upgrade to Premium?</h2>
+      <p class="text-sm" style="color: #5b8a76;">Get personalized reflections and choose your preferred tone.</p>
+    </div>
+    <form action="/settings/upgrade-premium" method="POST" class="flex gap-3">
+      <button type="button" onclick="closeReflectionUpgradeModal()" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm border">Cancel</button>
+      <button type="submit" class="flex-1 px-4 py-3 rounded-xl font-bold text-white text-sm" style="background: #7c3aed;">Yes, Upgrade</button>
+    </form>
+  </div>
+</div>
+
+<div id="dataUpgradeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <div class="text-center mb-5">
+      <h2 class="text-xl font-bold mb-2" style="color: #134e3a;">Upgrade to Premium?</h2>
+      <p class="text-sm" style="color: #5b8a76;">Export your check-in history and insight reports as CSV.</p>
+    </div>
+    <form action="/settings/upgrade-premium" method="POST" class="flex gap-3">
+      <button type="button" onclick="closeDataUpgradeModal()" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm border">Cancel</button>
+      <button type="submit" class="flex-1 px-4 py-3 rounded-xl font-bold text-white text-sm" style="background: #7c3aed;">Yes, Upgrade</button>
+    </form>
+  </div>
+</div>
+
+  <!-- DOWNGRADE WARNING MODAL -->
+  <div id="downgradeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-      <div class="text-center mb-5">
-        <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>
+      
+      <!-- Warning Icon + Title -->
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #fee2e2;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <path d="M12 9v4"/>
+            <path d="M12 17h.01"/>
           </svg>
         </div>
-        <h2 class="text-xl font-bold mb-2" style="color: #134e3a;">Upgrade to Premium?</h2>
-        <p class="text-sm" style="color: #5b8a76;">You'll get personalized AI reflections and recommendations. You'll be charged after 10 days.</p>
+        <h2 class="text-xl font-bold mb-2" style="color: #134e3a;">Are you sure?</h2>
+        <p class="text-sm" style="color: #5b8a76;">Downgrading to free plan will permanently delete:</p>
       </div>
-      <form action="/settings/upgrade-premium" method="POST" class="flex gap-3">
-        <button type="button" onclick="closeUpgradeModal()" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm border" style="color: #5b8a76; border-color: #e8efeb;">Cancel</button>
-        <button type="submit" class="flex-1 px-4 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">Yes, Upgrade</button>
-      </form>
+
+      <!-- Data loss warning list -->
+      <ul class="mb-4 space-y-2 rounded-xl p-4" style="background: #fef2f2; border: 1px solid #fecaca;">
+        <li class="flex items-start gap-2 text-sm" style="color: #991b1b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+          <span>Your stored recommendation activity</span>
+        </li>
+        <li class="flex items-start gap-2 text-sm" style="color: #991b1b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+          <span>Your reflection history</span>
+        </li>
+        <li class="flex items-start gap-2 text-sm" style="color: #991b1b;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+          <span>Your insight data</span>
+        </li>
+      </ul>
+
+      <!-- Tip: Export first -->
+      <div class="flex items-start gap-2 mb-5 p-3 rounded-xl" style="background: #fef9c3; border: 1px solid #fde047;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a16207" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <p class="text-xs leading-snug" style="color: #713f12;">
+          <span class="font-bold">Tip:</span> We recommend <a href="/export-data" class="font-bold underline hover:no-underline" style="color: #713f12;">exporting your data</a> first so you don't lose anything important.
+        </p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col gap-2">
+        <button type="button" onclick="closeDowngradeModal()" class="w-full px-4 py-3 rounded-xl font-semibold text-sm border" style="color: #134e3a; border-color: #e8efeb; background: #ffffff;">
+          Cancel — Keep Premium
+        </button>
+        <form action="/settings/cancel-premium" method="POST" class="w-full">
+          <button type="submit" class="w-full px-4 py-3 rounded-xl font-bold text-white text-sm shadow-md" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+            Yes, Unsubscribe Me
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- BOTTOM NAV -->
   <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-2 py-2 shadow-lg">
     <div class="max-w-2xl mx-auto flex items-center justify-around">
-      <a href="/dashboard" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
+      <a href="{{ url_for('main.dashboard') }}" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Dashboard</span>
       </a>
-      <a href="/checkin" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
+      <a href="{{ url_for('main.check_in') }}" class="nav-item flex flex-col items-center gap-1 px-3 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa89b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><polyline points="20 6 9 17 4 12"/></svg>
         <span class="text-xs font-medium" style="color: #8aa89b;">Check-in</span>
       </a>
@@ -393,7 +492,7 @@
       <a href="/logout" class="nav-item flex flex-col items-center gap-1 px-2 py-2 no-underline">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         <span class="text-xs font-medium" style="color: #dc2626;">Logout</span>
-    </a>
+      </a>
     </div>
   </nav>
 
@@ -407,11 +506,27 @@
     chevron.classList.toggle('open');
   }
 
-  function openUpgradeModal() {
-    document.getElementById('upgradeModal').classList.remove('hidden');
+  function openReflectionUpgradeModal() {
+    document.getElementById('reflectionUpgradeModal').classList.remove('hidden');
   }
-  function closeUpgradeModal() {
-    document.getElementById('upgradeModal').classList.add('hidden');
+
+  function closeReflectionUpgradeModal() {
+    document.getElementById('reflectionUpgradeModal').classList.add('hidden');
+  }
+
+  function openDataUpgradeModal() {
+    document.getElementById('dataUpgradeModal').classList.remove('hidden');
+  }
+
+  function closeDataUpgradeModal() {
+  document.getElementById('dataUpgradeModal').classList.add('hidden');
+}
+
+  function openDowngradeModal() {
+    document.getElementById('downgradeModal').classList.remove('hidden');
+  }
+  function closeDowngradeModal() {
+    document.getElementById('downgradeModal').classList.add('hidden');
   }
 
   function confirmDelete(type) {
@@ -425,29 +540,32 @@
   }
 
   // Check URL for ?open= parameter to auto-open specific section
-document.addEventListener('DOMContentLoaded', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sectionToOpen = urlParams.get('open');
-  
-  if (sectionToOpen === 'reflection') {
-    // Opened from insights page upgrade button - open Reflection section
-    toggleSection('reflection');
-    // Scroll to it smoothly
-    setTimeout(function() {
-      document.getElementById('content-reflection').scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-      });
-    }, 100);
-  } else if (sectionToOpen === 'data') {
-    toggleSection('data');
-  } else if (sectionToOpen === 'danger') {
-    toggleSection('danger');
-  } else {
-    // Default: open Account section
-    toggleSection('account');
-  }
-});
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionToOpen = urlParams.get('open');
+    
+    if (sectionToOpen === 'reflection') {
+      toggleSection('reflection');
+      setTimeout(function() {
+        document.getElementById('content-reflection').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 100);
+    } else if (sectionToOpen === 'data') {
+      toggleSection('data');
+    } else if (sectionToOpen === 'danger') {
+      toggleSection('danger');
+      setTimeout(function() {
+        document.getElementById('content-danger').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 100);
+    } else {
+      toggleSection('account');
+    }
+  });
 </script>
 
 </body>

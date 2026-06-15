@@ -12,6 +12,8 @@
 </head>
 <body>
 
+      {% include "components/flash_messages.html" %}
+
 <div class="min-h-screen relative overflow-hidden" style="background: #f7faf8;">
 
   <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-40" style="background: radial-gradient(ellipse, #d8f3e6 0%, transparent 70%);"></div>
@@ -20,7 +22,7 @@
   <div class="relative z-10 min-h-screen px-4 py-8 pb-32">
 
     <header class="max-w-2xl mx-auto flex items-center justify-between mb-8">
-      <a href="/" class="flex items-center gap-3 no-underline">
+      <a href="#" class="flex items-center gap-3 no-underline">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm" style="background: #157a5c;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
@@ -73,7 +75,12 @@
       <p class="text-sm" style="color: #5b8a76;">Take a moment to record how you're feeling and what you did today.</p>
     </div>
 
+<<<<<<< HEAD
     <form id="checkinForm" action="{{ url_for('main.check_in') }}" method="POST" class="max-w-2xl mx-auto">
+=======
+    <!-- FORM -->
+    <form action="{{ url_for('main.check_in') }}" method="POST" class="max-w-2xl mx-auto">
+>>>>>>> eef2da239fc9d99b6046eb29baeb5f81ec6e3d52
 
       <input type="hidden" name="mood" id="moodInput" value="" />
       <input type="hidden" name="habits_done" id="habitsInput" value="" />

@@ -13,6 +13,8 @@
 </head>
 <body>
 
+{% include "components/flash_messages.html" %}
+
   <div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #065f46 70%, #047857 100%);">
 
     <!-- Ambient glow blobs -->
@@ -36,7 +38,7 @@
 
       <!-- Header -->
       <header class="px-6 pt-6 pb-2 flex items-center justify-center max-w-3xl mx-auto w-full">
-        <a href="/" class="flex items-center gap-3 no-underline">
+        <a href="#" class="flex items-center gap-3 no-underline">
           <div class="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
@@ -120,7 +122,7 @@
           </p>
 
           <!-- Start button -->
-          <form action="/dashboard" method="GET" class="fade-in-up delay-1000">
+          <form action="{{ url_for('main.dashboard') }}" method="GET" class="fade-in-up delay-1000">
             <button type="submit" class="btn-primary group inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl font-bold text-emerald-900 text-lg shadow-xl" style="background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);">
               Start my journey
               <svg class="arrow-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

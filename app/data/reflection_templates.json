@@ -1,0 +1,245 @@
+{
+  "specific_habits": {
+    "Exercise 30 min": {
+      "high_mood": [
+        "Your mood was often higher on days you exercised. Consistent movement may be supporting your wellbeing.",
+        "Regular exercise appears to be linked with positive mood trends this week."
+      ],
+      "medium_mood": [
+        "You stayed active on some days. Building a more consistent exercise routine may help improve your mood further.",
+        "Exercise was present in your week, though its impact on mood was less noticeable."
+      ],
+      "low_mood": [
+        "Exercise alone may not explain your mood this week, but maintaining activity can still support long-term wellbeing.",
+        "Even with some exercise, your mood remained lower. Other habits may also be influencing how you feel."
+      ]
+    },
+
+    "Walk 8k+ steps": {
+      "high_mood": [
+        "Higher step counts were associated with better mood days.",
+        "Staying active through walking may be contributing positively to your wellbeing."
+      ],
+      "medium_mood": [
+        "Your walking habit was somewhat consistent. More regular movement may strengthen its benefits.",
+        "Walking remained part of your routine, though the connection to mood was moderate."
+      ],
+      "low_mood": [
+        "Walking can support wellbeing, even when mood remains challenging.",
+        "Your mood stayed lower despite some walking activity, suggesting other factors may also be important."
+      ]
+    },
+
+    "Stretch or yoga": {
+      "high_mood": [
+        "Stretching or yoga may be helping you feel more balanced and relaxed.",
+        "Days with stretching or yoga were often linked with positive mood."
+      ],
+      "medium_mood": [
+        "Your flexibility and mindfulness activities were somewhat consistent this week.",
+        "Stretching remained part of your routine and may provide additional benefits with greater consistency."
+      ],
+      "low_mood": [
+        "Yoga and stretching can support wellbeing even when mood remains low.",
+        "This habit may still provide value alongside other healthy routines."
+      ]
+    },
+
+    "Sleep 7+ hours": {
+      "high_mood": [
+        "Adequate sleep appears to be strongly associated with your better mood days.",
+        "Getting enough sleep may be helping you maintain emotional balance."
+      ],
+      "medium_mood": [
+        "Your sleep habits were reasonably consistent but may still have room for improvement.",
+        "Sleep appears to support your mood, though the relationship was moderate this week."
+      ],
+      "low_mood": [
+        "Sleep is important, but mood can also be affected by stress, activity, and daily experiences.",
+        "Even with sufficient sleep, other factors may have contributed to lower mood."
+      ]
+    },
+
+    "Consistent bedtime": {
+      "high_mood": [
+        "A consistent bedtime may be supporting your overall mood and energy.",
+        "Regular sleep timing appears to align with positive mood patterns."
+      ],
+      "medium_mood": [
+        "Your bedtime routine showed some consistency this week.",
+        "A more regular sleep schedule may strengthen its benefits."
+      ],
+      "low_mood": [
+        "Sleep timing is one part of wellbeing, though other habits may also influence mood.",
+        "Maintaining a regular bedtime can still support long-term health."
+      ]
+    },
+
+    "No screens before bed": {
+      "high_mood": [
+        "Reducing screen use before bed may be contributing to better sleep quality and mood.",
+        "Limiting screens before bedtime appears to align with positive mood trends."
+      ],
+      "medium_mood": [
+        "You practiced this habit on some days. Greater consistency may help maximize its benefits.",
+        "Reducing screen exposure before bed may continue supporting your wellbeing."
+      ],
+      "low_mood": [
+        "Screen habits are only one factor affecting mood and sleep quality.",
+        "Continuing this habit may still support healthier rest over time."
+      ]
+    },
+
+    "Drink 2L water": {
+      "high_mood": [
+        "Staying hydrated may be supporting your energy and wellbeing.",
+        "Your hydration habit appears to align with better mood days."
+      ],
+      "medium_mood": [
+        "Hydration was present but somewhat inconsistent this week.",
+        "Maintaining regular water intake may continue supporting your wellbeing."
+      ],
+      "low_mood": [
+        "Hydration is beneficial even when mood remains lower.",
+        "Water intake supports overall health, though mood is influenced by many factors."
+      ]
+    },
+
+    "Eat fruits or vegetables": {
+      "high_mood": [
+        "Nutritious food choices appear to align with your better mood days.",
+        "A balanced diet may be contributing positively to your wellbeing."
+      ],
+      "medium_mood": [
+        "Healthy food choices appeared in your routine this week.",
+        "Building consistency may strengthen the connection between nutrition and mood."
+      ],
+      "low_mood": [
+        "Nutrition supports wellbeing, though mood can be influenced by many factors.",
+        "Healthy eating remains valuable even during more difficult weeks."
+      ]
+    },
+
+    "No junk food": {
+      "high_mood": [
+        "Avoiding junk food may be supporting your overall wellbeing.",
+        "Healthier eating habits appear to align with positive mood trends."
+      ],
+      "medium_mood": [
+        "You showed some consistency with healthier food choices.",
+        "Small improvements in eating habits can build over time."
+      ],
+      "low_mood": [
+        "Food choices are one part of wellbeing and may work alongside other habits.",
+        "Maintaining healthy eating habits can support long-term health."
+      ]
+    },
+
+    "Meditation or breathing": {
+      "high_mood": [
+        "Mindfulness practices appear to be supporting your emotional wellbeing.",
+        "Meditation and breathing exercises may be helping you manage daily stress."
+      ],
+      "medium_mood": [
+        "You practiced mindfulness on some days this week.",
+        "More consistency may help strengthen its benefits."
+      ],
+      "low_mood": [
+        "Mindfulness can still be valuable during challenging periods.",
+        "Even when mood remains low, breathing exercises may provide moments of calm."
+      ]
+    },
+
+    "Journaling": {
+      "high_mood": [
+        "Reflecting through journaling may be helping you maintain positive wellbeing.",
+        "Journaling appears to align with stronger mood days."
+      ],
+      "medium_mood": [
+        "Your journaling habit showed some consistency this week.",
+        "Regular reflection may provide additional emotional benefits."
+      ],
+      "low_mood": [
+        "Journaling can be a useful outlet during difficult periods.",
+        "Writing down thoughts may still support self-awareness and wellbeing."
+      ]
+    },
+
+    "Time outdoors": {
+      "high_mood": [
+        "Spending time outdoors appears to align with your better mood days.",
+        "Fresh air and outdoor activities may be contributing positively to your wellbeing."
+      ],
+      "medium_mood": [
+        "Outdoor time was present in your routine this week.",
+        "More frequent outdoor activities may strengthen their benefits."
+      ],
+      "low_mood": [
+        "Being outdoors can still support wellbeing even during lower mood periods.",
+        "Small amounts of outdoor time may continue providing benefits."
+      ]
+    }
+  },
+
+  "categories": {
+    "Physical": {
+      "high_mood": [
+        "Your physical activity habits appear strongly associated with better mood this week.",
+        "Movement and exercise may be contributing positively to your wellbeing."
+      ],
+      "medium_mood": [
+        "Physical activity was present but somewhat inconsistent.",
+        "A more regular routine may help strengthen its benefits."
+      ],
+      "low_mood": [
+        "Physical activity remains valuable even when mood is lower.",
+        "Movement supports overall wellbeing, though mood depends on multiple factors."
+      ]
+    },
+
+    "Sleep": {
+      "high_mood": [
+        "Your sleep habits appear closely linked to positive mood trends.",
+        "Consistent sleep may be supporting your wellbeing."
+      ],
+      "medium_mood": [
+        "Your sleep habits showed mixed consistency this week.",
+        "Small improvements in sleep routines may support better wellbeing."
+      ],
+      "low_mood": [
+        "Sleep remains an important foundation for wellbeing.",
+        "Other factors may also be influencing your mood alongside sleep."
+      ]
+    },
+
+    "Nutrition": {
+      "high_mood": [
+        "Your nutrition habits appear associated with better mood outcomes.",
+        "Healthy eating may be supporting your wellbeing."
+      ],
+      "medium_mood": [
+        "Your nutrition habits showed moderate consistency this week.",
+        "Building healthier routines over time may strengthen their impact."
+      ],
+      "low_mood": [
+        "Nutrition remains important even during difficult weeks.",
+        "Food choices support overall health, though mood depends on many factors."
+      ]
+    },
+
+    "Mental": {
+      "high_mood": [
+        "Your mental wellbeing habits appear linked to positive mood trends.",
+        "Mindfulness and reflection may be supporting your emotional balance."
+      ],
+      "medium_mood": [
+        "Mental wellbeing activities appeared in your routine this week.",
+        "Greater consistency may help strengthen their benefits."
+      ],
+      "low_mood": [
+        "Mental wellbeing habits can still provide support during difficult periods.",
+        "Small moments of reflection or mindfulness may remain valuable."
+      ]
+    }
+  }
+}
