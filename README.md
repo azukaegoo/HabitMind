@@ -1,230 +1,162 @@
-# One Button App
+# HabitMind
 
-A simple Flask-based web application .  
-The app demonstrates a minimal full-stack setup where a single button click is stored in a PostgreSQL database.
+HabitMind is a habit and mood tracking web application designed to help users understand how their daily habits influence their emotional well-being.
 
-The project is containerized using Docker and includes testing, CI integration, and a clean modular structure.
+Users complete regular check-ins by recording their mood and selecting habits they completed. HabitMind analyzes this data and generates weekly insights that highlight patterns between habits and mood trends.
 
----
-
-## 📌 Project Overview
-
-This application follows a standard Flask architecture using an application factory pattern.
-
-When a user clicks a button on the homepage:
-- A POST request is sent to the backend
-- A database record is created
-- A success or error message is displayed
-
-This project demonstrates:
-- Backend development with Flask
-- Database integration with PostgreSQL
-- Containerized development using Docker
-- Testing and CI workflows
+The platform offers both Free and Premium experiences. Free users receive basic insights, while Premium users gain access to personalized reflections, activity recommendations, insight history, and data export features.
 
 ---
 
-##  Features
+## Features
 
-- Single-button interaction (core functionality)
-- Database persistence of button clicks
-- Flash messages for feedback
-- Docker-based environment setup
-- Automated testing using `pytest`
-- Continuous Integration with GitHub Actions
+### User Accounts
 
----
+* User registration and login
+* Secure password hashing
+* Protected authenticated routes
+* User profile management
 
-## Tech Stack
+### Habit Tracking
 
-- **Backend:** Flask
-- **Database:** PostgreSQL
-- **ORM:** SQLAlchemy (Flask-SQLAlchemy)
-- **Migrations:** Flask-Migrate
-- **Testing:** pytest
-- **Environment Variables:** python-dotenv
-- **Containerization:** Docker & Docker Compose
-- **CI/CD:** GitHub Actions
+Users can track habits across multiple wellness categories.
 
----
+#### Physical
 
----
+* Exercise 30 min
+* Walk 8k+ steps
+* Stretch or yoga
 
-## How It Works
+#### Sleep
 
-1. User opens the homepage
-2. Clicks the **"Click Me"** button
-3. A POST request is sent to the `/submit` route
-4. Backend:
-   - Creates a new database entry (`OneAppButton`)
-   - Saves the timestamp
-5. Result:
-   - Success → confirmation message
-   - Failure → rollback + error message
+* Sleep 7+ hours
+* Consistent bedtime
+* No screens before bed
 
----
+#### Nutrition
 
-## 🧑‍💻 Getting Started
+* Drink 2L water
+* Eat fruits or vegetables
+* No junk food
 
-### 1. Clone the Repository
+#### Mental
 
-```bash
-git clone repository
-cd Team_SGD
-```
-### 2. Setting environment variable
-```bash
-cp .env_sample .env
-```
-### 3. Run with Docker
-```bash
-docker compose up --build
-```
-### 4. Open Application
-```bash
-http://localhost:5000
-```
-### 5. Open another terminal and start tailwind in watch mode
-Start Tailwind watch mode:
+* Meditation or breathing
+* Journaling
+* Time outdoors
 
-```bash
-npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --watch
-```
+#### Social
 
-This automatically rebuilds CSS whenever changes are made.
+* Connect with someone
+* Limit social media
+* Help someone
 
----
+#### Growth
 
-## Opening the Project in Codespaces
+* Read 20 minutes
+* Learn something new
+* Practice gratitude
 
-1. Open the repository on GitHub
-2. Click:
+### Mood Check-ins
 
-```text
-Code → Codespaces → Create codespace on main
-```
+* Mood rating from 1–10
+* One check-in per day
+* Habit selection during check-in
+* Streak tracking
+* Average mood tracking
 
-3. Wait for the dev container to finish configuring
+### Weekly Insights
 
-The dev container automatically:
+After completing at least five check-ins, HabitMind generates:
 
-- installs Node.js
-- installs npm packages
-- starts Docker services
-- forwards ports 5000 and 5432
+* Average mood score
+* Top habits associated with higher moods
+* Habit pattern observations
+* Weekly mood summary
+
+### Premium Features
+
+Premium users receive:
+
+* Personalized reflections
+* Reflection tone selection
+
+  * Supportive
+  * Balanced
+  * Challenge
+* Personalized activity recommendations
+* Insight history
+* Data export
+* Location-based recommendations (planned)
 
 ---
 
-## Project Stack
+## Subscription Plans
 
-- Flask
-- PostgreSQL
-- Docker Compose
-- Tailwind CSS
-- GitHub Codespaces
+### Free Plan
 
----
+* Daily check-ins
+* Mood tracking
+* Habit tracking
+* Weekly insights
+* Current insight only (no history)
 
-Check running containers:
+### Premium Plan
 
-```bash
-docker ps
-```
-
----
-Expected containers:
-
-```text
-team_sgd-web-1
-team_sgd-db-1
-```
+* Everything in Free
+* Personalized reflections
+* Activity recommendations
+* Insight history
+* Data export
+* Future location-based recommendations
 
 ---
 
-## Running Tailwind CSS
+## Technology Stack
 
-Start Tailwind watch mode:
+### Backend
 
-```bash
-npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --watch
-```
+* Python
+* Flask
+* Flask-Login
+* Flask-SQLAlchemy
+* PostgreSQL
 
-This automatically rebuilds CSS whenever changes are made.
+### Frontend
+
+* HTML
+* Tailwind CSS
+* Jinja2 Templates
+
+### Database
+
+* PostgreSQL
+
+### Development Tools
+
+* Docker
+* Docker Compose
+* Git
+* GitHub
+* 
+---
+
+## Future Enhancements
+
+* Ticketmaster activity integration
+* OpenStreetMap location recommendations
+* Advanced habit analytics
+* Goal-specific recommendations
+* Mobile application support
+* Social accountability features
 
 ---
 
-## Accessing the Application
+## Authors
 
-Flask app:
-
-```text
-http://localhost:5000
-```
-
-PostgreSQL:
-
-```text
-localhost:5432
-```
+HabitMind was developed as a wellness and habit-tracking platform focused on helping users build healthier routines and better understand the connection between habits and mood.
 
 ---
-
-## Useful Docker Commands
-
-Stop containers:
-
-```bash
-docker compose down
-```
-
-Restart containers:
-
-```bash
-docker compose restart
-```
-
-Rebuild containers:
-
-```bash
-docker compose up --build
-```
-
-View logs:
-
-```bash
-docker compose logs
-```
-
-View web logs only:
-
-```bash
-docker compose logs web
-```
-
----
-
-# Recommended Workflow
-
-## Frontend Development
-
-```bash
-npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --watch
-```
-
----
-
-# Important Notes
-
-- Do NOT commit `.env`
-- Do NOT commit `node_modules`
-- Do NOT commit `__pycache__`
-- Commit migration files after successful migrations
-
----
-
-
-
-
 ## Team Roles
 
 #### Human Members
@@ -235,8 +167,6 @@ npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.cs
 
 #### AI Assistance
 - Assists with debugging errors (e.g., Docker, database issues)
-- Explains concepts when needed
-- Suggests improvements or alternative implementations
 - Help generate tests when needed
 
 AI is used as a development assistant, while all final decisions remain with the team.
@@ -255,4 +185,11 @@ To ensure the project stays aligned:
 
 - Code reviews ensure consistency and correctness
 - Testing (`pytest`) is used to validate functionality
+
+---
+## Documentation
+
+- [Setup Guide](docs/setup.md)
+- [Architecture](docs/architecture.md)
+- [API Documentation](docs/database.md)
 
