@@ -81,7 +81,7 @@ The dev container automatically:
 - forwards ports 5000 and 5432
 
 4. For continuous coding
-   (i) Always "git pill" before "docker compose build", so as to update to latest changes in the repository
+   (i) "docker compose up" and Always "git pill" before "docker compose build", so as to update to latest changes in the repository
 
 ---
 
