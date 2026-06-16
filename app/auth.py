@@ -118,13 +118,20 @@ def change_password():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
         
-    old_password = request.form.get('old_password')
+    current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     
-    if not current_user.check_password(old_password):
+    # 1. Prevent empty submissions
+    if not current_password or not new_password:
+        flash('Please fill out all fields.', 'error')
+        return redirect(url_for('main.settings'))
+        
+    # 2. Check current password
+    if not current_user.check_password(current_password):
         flash('Incorrect current password.', 'error')
         return redirect(url_for('main.settings'))
         
+    # 3. Change password successfully
     current_user.set_password(new_password)
     db.session.commit()
     

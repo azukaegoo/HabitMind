@@ -13,8 +13,19 @@ def app():
     app = create_app(test_config)
 
     with app.app_context():
+        # Create tables
         db.create_all()
+        
+        # Pre-populate the test database with a default user
+        user = User(name="Test User", email="test@example.com", plan="free")
+        user.set_password("password123")
+        db.session.add(user)
+        db.session.commit()
+        
         yield app
+        
+        # Clean up after tests finish
+        db.session.remove()
         db.drop_all()
 
 @pytest.fixture
@@ -23,20 +34,23 @@ def client(app):
     return app.test_client()
 
 @pytest.fixture
-def authenticated_user(app):
-    """Create a test user and simulate an authenticated session."""
-    with app.app_context():
-        user = User(
-            name="Test User",
-            email="test@example.com",
-            plan="free"
-        )
-        user.set_password("password123")
+def auth(client):
+    """Authentication helper to simulate real user logins/logouts."""
+    class AuthActions:
+        def login(self, email="test@example.com", password="password123"):
+            return client.post('/login', data={
+                'email': email,
+                'password': password
+            }, follow_redirects=True)
+            
+        def logout(self):
+            return client.get('/logout', follow_redirects=True)
+            
+    return AuthActions()
 
-        db.session.add(user)
-        db.session.commit()
-        
-        db.session.refresh(user)
-        db.session.expunge(user)
-        
+@pytest.fixture
+def authenticated_user(app):
+    """Restore the old fixture for test_checkin.py compatibility."""
+    with app.app_context():
+        user = User.query.filter_by(email="test@example.com").first()
         return user
