@@ -1,10 +1,10 @@
 # HabitMind
 
-HabitMind is a habit and mood tracking web application designed to help users understand how their daily habits influence their emotional well-being.
+HabitMind is a habit and mood tracking web application that helps users understand how their daily routines influence their emotional well-being.
 
-Users complete regular check-ins by recording their mood and selecting habits they completed. HabitMind analyzes this data and generates weekly insights that highlight patterns between habits and mood trends.
+Users complete daily check-ins by recording their mood and selecting the habits they completed. HabitMind analyzes this data and generates weekly insights that highlight patterns between habits and mood trends.
 
-The platform offers both Free and Premium experiences. Free users receive basic insights, while Premium users gain access to personalized reflections, activity recommendations, insight history, and data export features.
+The platform supports both Free and Premium experiences. Free users receive basic insights, while Premium users gain access to personalized reflections, activity recommendations, insight history, and data export features.
 
 ---
 
@@ -23,27 +23,27 @@ Users can track habits across multiple wellness categories.
 
 #### Physical
 
-* Exercise 30 min
+* Exercise for 30 minutes
 * Walk 8k+ steps
-* Stretch or yoga
+* Stretch or practice yoga
 
 #### Sleep
 
 * Sleep 7+ hours
-* Consistent bedtime
-* No screens before bed
+* Keep a consistent bedtime
+* Avoid screens before bed
 
 #### Nutrition
 
-* Drink 2L water
+* Drink 2L of water
 * Eat fruits or vegetables
-* No junk food
+* Avoid junk food
 
 #### Mental
 
-* Meditation or breathing
-* Journaling
-* Time outdoors
+* Meditate or practice breathing exercises
+* Journal
+* Spend time outdoors
 
 #### Social
 
@@ -53,13 +53,13 @@ Users can track habits across multiple wellness categories.
 
 #### Growth
 
-* Read 20 minutes
+* Read for 20 minutes
 * Learn something new
 * Practice gratitude
 
 ### Mood Check-ins
 
-* Mood rating from 1–10
+* Mood rating from 1-10
 * One check-in per day
 * Habit selection during check-in
 * Streak tracking
@@ -67,7 +67,7 @@ Users can track habits across multiple wellness categories.
 
 ### Weekly Insights
 
-After completing at least five check-ins, HabitMind generates:
+After at least five check-ins, HabitMind generates:
 
 * Average mood score
 * Top habits associated with higher moods
@@ -79,11 +79,10 @@ After completing at least five check-ins, HabitMind generates:
 Premium users receive:
 
 * Personalized reflections
-* Reflection tone selection
-
+* Reflection tone selection:
   * Supportive
   * Balanced
-  * Challenge
+  * Challenging
 * Personalized activity recommendations
 * Insight history
 * Data export
@@ -99,7 +98,7 @@ Premium users receive:
 * Mood tracking
 * Habit tracking
 * Weekly insights
-* Current insight only (no history)
+* Current insight only, without history
 
 ### Premium Plan
 
@@ -126,11 +125,7 @@ Premium users receive:
 
 * HTML
 * Tailwind CSS
-* Jinja2 Templates
-
-### Database
-
-* PostgreSQL
+* Jinja2 templates
 
 ### Development Tools
 
@@ -138,7 +133,56 @@ Premium users receive:
 * Docker Compose
 * Git
 * GitHub
-* 
+* GitHub Actions
+* pytest
+
+---
+
+## Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/azukaegoo/Team_SGD.git
+cd Team_SGD
+```
+
+### 2. Create Environment Variables
+
+```bash
+cp .env_sample .env
+```
+
+Update `.env` with the local values required for your development environment.
+
+### 3. Run the Application
+
+```bash
+docker compose up --build
+```
+
+Open the app at:
+
+```text
+http://localhost:5000
+```
+
+### 4. Run Tailwind in Watch Mode
+
+In a separate terminal, run:
+
+```bash
+npx @tailwindcss/cli -i ./app/static/src/input.css -o ./app/static/css/output.css --watch
+```
+
+This rebuilds the CSS whenever frontend styles change.
+
+### 5. Run Tests
+
+```bash
+pytest
+```
+
 ---
 
 ## Future Enhancements
@@ -152,44 +196,38 @@ Premium users receive:
 
 ---
 
-## Authors
-
-HabitMind was developed as a wellness and habit-tracking platform focused on helping users build healthier routines and better understand the connection between habits and mood.
-
----
 ## Team Roles
 
-#### Human Members
-- Design system architecture
-- Implement and integrate features
-- Review and test all code before merging
-- Manage GitHub branches and pull requests
+### Human Members
 
-#### AI Assistance
-- Assists with debugging errors (e.g., Docker, database issues)
-- Help generate tests when needed
+* Define the design system and application architecture
+* Implement and integrate features
+* Review and test code before merging
+* Manage GitHub branches and pull requests
+
+### AI Assistance
+
+* Assist with debugging errors, including Docker and database issues
+* Help generate tests when needed
+* Support documentation and code review workflows
 
 AI is used as a development assistant, while all final decisions remain with the team.
 
+---
 
-### Ensuring Correct Direction
+## Development Workflow
 
-To ensure the project stays aligned:
+To keep the project aligned:
 
-- The team agrees on architecture and design decisions before implementation
-
-- GitHub is used for:
-  - version control
-  - pull requests
-  - tracking changes
-
-- Code reviews ensure consistency and correctness
-- Testing (`pytest`) is used to validate functionality
+* The team agrees on architecture and design decisions before implementation.
+* GitHub is used for version control, pull requests, and tracking changes.
+* Code reviews help maintain consistency and correctness.
+* Tests are run with `pytest` to validate functionality.
 
 ---
+
 ## Documentation
 
-- [Setup Guide](docs/setup.md)
-- [Architecture](docs/architecture.md)
-- [API Documentation](docs/database.md)
-
+* [Setup Guide](docs/setup.md)
+* [Architecture](docs/architecture.md)
+* [Database Documentation](docs/database.md)
