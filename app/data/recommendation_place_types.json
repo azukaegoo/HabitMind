@@ -1,0 +1,57 @@
+{
+  "park": {
+    "emoji": "🌳",
+    "subtitle": "A nearby outdoor place for movement or fresh air.",
+    "tag": "Outdoor"
+  },
+  "library": {
+    "emoji": "📚",
+    "subtitle": "A quiet place for reading or reflection.",
+    "tag": "Quiet"
+  },
+  "cafe": {
+    "emoji": "☕",
+    "subtitle": "A nearby place for a calm break or social connection.",
+    "tag": "Social"
+  },
+  "museum": {
+    "emoji": "🏛️",
+    "subtitle": "A nearby place to learn or explore something new.",
+    "tag": "Growth"
+  },
+  "market": {
+    "emoji": "🥗",
+    "subtitle": "A nearby place that may support healthier food choices.",
+    "tag": "Food"
+  },
+  "gym": {
+    "emoji": "🏋️",
+    "subtitle": "A nearby fitness place that supports physical activity.",
+    "tag": "Fitness"
+  },
+  "trail": {
+    "emoji": "🚶",
+    "subtitle": "A nearby walking route for movement and fresh air.",
+    "tag": "Walking"
+  },
+  "garden": {
+    "emoji": "🌿",
+    "subtitle": "A calm outdoor space for reflection or gratitude.",
+    "tag": "Calm"
+  },
+  "community": {
+    "emoji": "🤝",
+    "subtitle": "A nearby community space for connection or support.",
+    "tag": "Community"
+  },
+  "event": {
+    "emoji": "🎟️",
+    "subtitle": "A nearby event that may support your social or growth goals.",
+    "tag": "Event"
+  },
+  "nearby": {
+    "emoji": "📍",
+    "subtitle": "A nearby activity option based on your habit pattern.",
+    "tag": "Nearby"
+  }
+}

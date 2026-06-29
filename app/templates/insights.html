@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .btn-primary { transition: transform 0.2s ease, box-shadow 0.2s ease; }
@@ -181,7 +183,13 @@
       <!-- Recommended Near You card -->
       <div class="rounded-2xl border border-gray-100 shadow-sm p-5" style="background: {% if is_premium %}#ffffff{% else %}#f5f0fc{% endif %};">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold" style="color: #134e3a;">Recommended Activity Near You</h3>
+          <h3 class="text-base font-bold" style="color:#134e3a;">
+{% if recommendations and recommendations[0].is_fallback %}
+    Recommended Activities
+{% else %}
+    Recommended Activity Near You
+{% endif %}
+</h3>
           {% if not is_premium %}
 
           <span class="inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full" style="background: #ede9fe; color: #6d28d9;">
@@ -190,7 +198,7 @@
           </span>
           {% endif %}
         </div>
-        {% if is_premium %}
+        {% if is_premium and not recommendations and not history_mode %}
 <button
     id="enable-location-btn"
     class="w-full rounded-xl py-3 font-semibold text-white mb-4"
@@ -205,19 +213,47 @@
 {% endif %}
         {% if is_premium and recommendations %}
           <p class="text-xs mb-3" style="color: #5b8a76;">Activities that can support your well-being.</p>
-          <div class="space-y-3">
-            {% for rec in recommendations %}
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center" style="background: #d8f3e6;"><span class="text-xl">{{ rec.emoji if rec.emoji else '✨' }}</span></div>
-              <div class="flex-1 min-w-0">
-                <p class="font-semibold text-sm truncate" style="color: #134e3a;">{{ rec.title }}</p>
-                <p class="text-xs" style="color: #5b8a76;">{{ rec.subtitle }}</p>
-              </div>
-              {% if rec.tag %}<span class="text-xs font-medium px-2 py-1 rounded-full" style="background: #fef3c7; color: #b45309;">{{ rec.tag }}</span>{% endif %}
-            </div>
-            {% endfor %}
-          </div>
-          <a href="#" class="block text-center mt-4 text-sm font-semibold" style="color: #7c3aed;">View more activities →</a>
+          {% if recommendations and recommendations[0].is_fallback %}
+<div
+    class="rounded-xl px-3 py-2 mb-3"
+    style="background:#f8fafc;border:1px solid #e2e8f0;"
+>
+    <p class="text-xs font-medium" style="color:#475569;">
+        Personalized activity suggestions based on your recent habits.
+    </p>
+</div>
+{% endif %}
+        <div class="space-y-3">
+  {% for rec in recommendations %}
+  <button
+    type="button"
+    class="recommendation-card w-full flex items-center gap-3 rounded-xl p-3 text-left hover:bg-gray-50 transition"
+    data-title="{{ rec.title }}"
+    data-subtitle="{{ rec.subtitle }}"
+    data-url="{{ rec.url }}"
+    data-lat="{{ rec.lat if rec.lat else '' }}"
+    data-lon="{{ rec.lon if rec.lon else '' }}"
+    data-fallback="{{ 'true' if rec.is_fallback else 'false' }}"
+  >
+    <div class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center" style="background:#d8f3e6;">
+      <span class="text-xl">{{ rec.emoji }}</span>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p class="font-semibold text-sm truncate" style="color:#134e3a;">{{ rec.title }}</p>
+      <p class="text-xs" style="color:#5b8a76;">{{ rec.subtitle }}</p>
+    </div>
+
+    <span class="text-xs font-medium px-2 py-1 rounded-full flex-shrink-0" style="background:#fef3c7;color:#b45309;">
+      {{ rec.tag }}
+    </span>
+
+    {% if not rec.is_fallback %}
+    <span style="color:#7c3aed;">↗</span>
+    {% endif %}
+  </button>
+  {% endfor %}
+</div>
         {% else %}
           <div class="text-center py-3">
             <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background: #ede9fe;">
@@ -254,11 +290,13 @@
 
     <!-- VIEW HISTORY -->
     <div class="max-w-2xl mx-auto text-center mb-5">
-      <a href="/insights/history" class="inline-flex items-center gap-1.5 text-sm font-semibold no-underline hover:gap-2 transition-all" style="color: #157a5c;">
+      {% if is_premium and has_history %}
+      <a href="{{ url_for('main.insight_history') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold no-underline hover:gap-2 transition-all" style="color: #157a5c;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
         View Insight History
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
+      {% endif %}
     </div>
 
   </div>
@@ -290,6 +328,32 @@
   </nav>
 
 </div>
+<div id="map-modal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl w-full max-w-md p-4 shadow-xl">
+    <div class="flex justify-between items-start mb-3">
+      <div>
+        <h3 id="modal-title" class="font-bold text-lg" style="color:#134e3a;"></h3>
+        <p id="modal-subtitle" class="text-sm" style="color:#5b8a76;"></p>
+      </div>
+      <button id="close-map-modal" class="text-xl font-bold">×</button>
+    </div>
+
+    <div id="recommendation-map" class="w-full h-64 rounded-xl mb-4"></div>
+
+    <a
+      id="open-map-link"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="block text-center rounded-xl py-3 font-semibold text-white"
+      style="background:#7c3aed;"
+    >
+      Open in Maps
+    </a>
+  </div>
+</div>
+
+{% if not history_mode %}
 <script>
 const locationBtn = document.getElementById("enable-location-btn");
 
@@ -330,6 +394,52 @@ if (locationBtn) {
     });
 }
 </script>
+{% endif %}
+<script>
+let recommendationMap = null;
 
+document.querySelectorAll(".recommendation-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const title = card.dataset.title;
+    const subtitle = card.dataset.subtitle;
+    const url = card.dataset.url;
+    const lat = card.dataset.lat;
+    const lon = card.dataset.lon;
+    const isFallback = card.dataset.fallback === "true";
+
+    if (isFallback) {
+        return;
+    }
+
+    if (!lat || !lon) {
+        window.open(url, "_blank");
+        return;
+    }
+
+    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-subtitle").textContent = subtitle;
+    document.getElementById("open-map-link").href = url;
+    document.getElementById("map-modal").classList.remove("hidden");
+
+    setTimeout(() => {
+      if (recommendationMap) {
+        recommendationMap.remove();
+      }
+
+      recommendationMap = L.map("recommendation-map").setView([lat, lon], 16);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(recommendationMap);
+
+      L.marker([lat, lon]).addTo(recommendationMap).bindPopup(title).openPopup();
+    }, 100);
+  });
+});
+
+document.getElementById("close-map-modal").addEventListener("click", () => {
+  document.getElementById("map-modal").classList.add("hidden");
+});
+</script>
 </body>
 </html>

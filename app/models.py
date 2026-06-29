@@ -169,6 +169,15 @@ class InsightReport(db.Model):
         lazy=True
     )
 
+    __table_args__ = (
+        db.UniqueConstraint(
+            "user_id",
+            "period_start",
+            "period_end",
+            name="unique_user_insight_period"
+        ),
+    )
+
 
 class PremiumInsight(db.Model):
     """
