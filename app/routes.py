@@ -4,15 +4,18 @@ from . import db
 import logging
 import io
 import csv
-import os
-import random
+from .services.insight_helpers import (
+    get_location_recommendations,
+    build_top_habits,
+    generate_noticed_patterns,
+    generate_reflection
+)
 import json
 from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from itertools import combinations
-from collections import Counter, defaultdict
+from collections import defaultdict
 from .models import User, Habit, UserHabit, CheckIn, CheckInHabit, CurrentInsight, InsightReport, PremiumInsight
 
 logger = logging.getLogger(__name__)
@@ -781,81 +784,6 @@ def delete_account():
         return redirect(url_for("main.settings", open="danger"))
 
 
-# ═══════════════════════════════════════════
-# Helper function for insights
-# ═══════════════════════════════════════════
-
-def load_json_file(filename):
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(base_dir, "data", filename)
-
-    with open(json_path, "r", encoding="utf-8") as file:
-        return json.load(file)
-
-
-def get_mood_range(avg_mood):
-    if avg_mood >= 7:
-        return "high_mood"
-    elif avg_mood >= 4:
-        return "medium_mood"
-    return "low_mood"
-
-
-def get_base_reflection(habit_name, category, avg_mood):
-    templates = load_json_file("reflection_templates.json")
-    mood_range = get_mood_range(avg_mood)
-
-    specific_habits = templates.get("specific_habits", {})
-    categories = templates.get("categories", {})
-
-    if habit_name in specific_habits:
-        options = specific_habits[habit_name].get(mood_range, [])
-    else:
-        options = categories.get(category, {}).get(mood_range, [])
-
-    if options:
-        return random.choice(options)
-
-    return "Keep tracking your habits to discover patterns in your mood over time."
-
-
-def apply_reflection_tone(base_reflection, tone):
-    tone_templates = load_json_file("tone_templates.json")
-
-    if not tone:
-        tone = "balanced"
-
-    tone_data = tone_templates.get(tone, tone_templates.get("balanced"))
-
-    prefix = random.choice(tone_data.get("prefixes", [""]))
-    suffix = random.choice(tone_data.get("suffixes", [""]))
-
-    return f"{prefix} {base_reflection} {suffix}".strip()
-
-
-def get_dummy_recommendations():
-    return [
-        {
-            "emoji": "🌳",
-            "title": "Take a short walk nearby",
-            "subtitle": "A simple outdoor activity that supports mood and movement.",
-            "tag": "Outdoor"
-        },
-        {
-            "emoji": "🧘",
-            "title": "Try a short breathing session",
-            "subtitle": "A calm activity that matches mental wellbeing habits.",
-            "tag": "Calm"
-        },
-        {
-            "emoji": "📚",
-            "title": "Visit a quiet study or reading space",
-            "subtitle": "A simple activity for reflection and personal growth.",
-            "tag": "Growth"
-        }
-    ]
-
-
 @main.route("/insights")
 @login_required
 def insights():
@@ -900,7 +828,9 @@ def insights():
             noticed_patterns=["Your patterns will appear here after a few check-ins."],
             is_premium=current_user.is_premium(),
             reflection=None,
-            recommendations=[]
+            recommendations=[],
+            has_history=False,
+            history_mode=False
         )
 
     saved_premium_report = (
@@ -934,7 +864,9 @@ def insights():
                 noticed_patterns=json.loads(existing_current.what_we_noticed or "[]"),
                 is_premium=False,
                 reflection=None,
-                recommendations=[]
+                recommendations=[],
+                has_history=False,
+                history_mode=False
             )
 
     else:
@@ -951,6 +883,7 @@ def insights():
             reflection = None
             recommendations = []
 
+
             if existing_report.premium_insight:
                 reflection = {
                     "text": existing_report.premium_insight.reflection_text,
@@ -958,10 +891,51 @@ def insights():
                     "emoji": top_habits[0]["emoji"] if top_habits else "✨"
                 }
 
-                if existing_report.premium_insight.recommendations_json:
+                premium = existing_report.premium_insight
+
+                if premium.recommendations_json:
                     recommendations = json.loads(
-                        existing_report.premium_insight.recommendations_json
+                        premium.recommendations_json
                     )
+                    print("DEBUG saved recommendations:", premium.recommendations_json, flush=True)
+                else:
+                    latitude = session.get("location_latitude")
+                    longitude = session.get("location_longitude")
+
+                    print("DEBUG regenerating recommendations", flush=True)
+                    print("DEBUG latitude:", session.get("location_latitude"), flush=True)
+                    print("DEBUG longitude:", session.get("location_longitude"), flush=True)
+                    print("DEBUG habit:", top_habits[0]["name"] if top_habits else None, flush=True)
+
+                    if latitude and longitude:
+                        recommendations = get_location_recommendations(
+                            latitude=latitude,
+                            longitude=longitude,
+                            habit_name=top_habits[0]["name"] if top_habits else "Time outdoors",
+                            category=top_habits[0]["category"] if top_habits else "Mental"
+                        )
+
+
+                    else:
+                        recommendations = []
+
+                    if recommendations and not recommendations[0].get("is_fallback"):
+                        premium.recommendations_json = json.dumps(
+                            recommendations,
+                            ensure_ascii=False
+                        )
+                        premium.recommendation_source = "location_api"
+                    else:
+                        premium.recommendations_json = None
+                        premium.recommendation_source = "fallback"
+
+                    db.session.commit()
+
+            has_history = (
+                    db.session.query(InsightReport.id)
+                    .filter_by(user_id=current_user.id)
+                    .first() is not None
+            )
 
             return render_template(
                 "insights.html",
@@ -974,7 +948,11 @@ def insights():
                 noticed_patterns=noticed_patterns,
                 is_premium=True,
                 reflection=reflection,
-                recommendations=recommendations
+                recommendations=recommendations,
+                history_mode=False,
+                has_history=has_history,
+
+
             )
 
     # Generate new insight
@@ -986,64 +964,13 @@ def insights():
         1
     )
 
-    habit_counter = Counter()
-    habit_lookup = {}
+    top_habits = build_top_habits(checkins)
 
-    for checkin in checkins:
-        for item in checkin.habits:
-            if item.habit:
-                habit_counter[item.habit.name] += 1
-                habit_lookup[item.habit.name] = item.habit
-
-    top_habits = []
-
-    for habit_name, count in habit_counter.most_common(3):
-        habit = habit_lookup[habit_name]
-
-        top_habits.append({
-            "name": habit.name,
-            "category": habit.category,
-            "emoji": habit.icon or "✨",
-            "count": count
-        })
-
-    noticed_patterns = []
-
-    if top_habits:
-        noticed_patterns.append(
-            f"<strong>{top_habits[0]['name']}</strong> appeared most often in this insight period."
-        )
-
-        noticed_patterns.append(
-            f"Your average mood for this period was <strong>{avg_mood}/10</strong>."
-        )
-
-        if len(top_habits) >= 2:
-            noticed_patterns.append(
-                f"<strong>{top_habits[0]['name']}</strong> and <strong>{top_habits[1]['name']}</strong> were your strongest habit patterns."
-            )
-
-        if checkin_done < 7:
-            noticed_patterns.append(
-                f"You completed <strong>{checkin_done}/7</strong> check-ins. More check-ins can make future insights more accurate."
-            )
-
-        if avg_mood >= 7:
-            noticed_patterns.append(
-                "Your mood was generally positive during this period."
-            )
-        elif avg_mood >= 4:
-            noticed_patterns.append(
-                "Your mood was moderate during this period, so consistency may help reveal clearer patterns."
-            )
-        else:
-            noticed_patterns.append(
-                "Your mood was lower during this period, so gentle and manageable habits may be helpful to observe."
-            )
-    else:
-        noticed_patterns.append(
-            "Your patterns will appear here after a few check-ins."
-        )
+    noticed_patterns = generate_noticed_patterns(
+        checkins=checkins,
+        top_habits=top_habits,
+        avg_mood=avg_mood
+    )
 
     is_premium = current_user.is_premium()
 
@@ -1053,24 +980,24 @@ def insights():
     if is_premium and top_habits:
         main_habit = top_habits[0]
 
-        base_reflection = get_base_reflection(
-            habit_name=main_habit["name"],
-            category=main_habit["category"],
-            avg_mood=avg_mood
-        )
-
-        final_reflection = apply_reflection_tone(
-            base_reflection=base_reflection,
+        reflection = generate_reflection(
+            top_habits=top_habits,
+            avg_mood=avg_mood,
             tone=current_user.reflection_tone
         )
 
-        reflection = {
-            "text": final_reflection,
-            "habit": main_habit["name"],
-            "emoji": main_habit["emoji"]
-        }
+        latitude = session.get("location_latitude")
+        longitude = session.get("location_longitude")
 
-        recommendations = get_dummy_recommendations()
+        if latitude and longitude:
+            recommendations = get_location_recommendations(
+                latitude=latitude,
+                longitude=longitude,
+                habit_name=main_habit["name"],
+                category=main_habit["category"]
+            )
+        else:
+            recommendations = []
 
     # Save generated insight
     try:
@@ -1090,28 +1017,61 @@ def insights():
             db.session.add(current_insight)
 
         else:
-            insight_report = InsightReport(
+            insight_report = InsightReport.query.filter_by(
                 user_id=current_user.id,
                 period_start=period_start,
-                period_end=period_end,
-                checkin_count=checkin_done,
-                average_mood=avg_mood,
-                top_habits_json=json.dumps(top_habits, ensure_ascii=False),
-                what_we_noticed=json.dumps(noticed_patterns, ensure_ascii=False),
-                goals_snapshot=current_user.selected_goals,
-                habits_snapshot_json=json.dumps(top_habits, ensure_ascii=False)
-            )
+                period_end=period_end
+            ).first()
 
-            db.session.add(insight_report)
-            db.session.flush()
+            if not insight_report:
+                insight_report = InsightReport(
+                    user_id=current_user.id,
+                    period_start=period_start,
+                    period_end=period_end,
+                    checkin_count=checkin_done,
+                    average_mood=avg_mood,
+                    top_habits_json=json.dumps(top_habits, ensure_ascii=False),
+                    what_we_noticed=json.dumps(noticed_patterns, ensure_ascii=False),
+                    goals_snapshot=current_user.selected_goals,
+                    habits_snapshot_json=json.dumps(top_habits, ensure_ascii=False)
+                )
+
+                db.session.add(insight_report)
+                db.session.flush()
+            else:
+                insight_report.checkin_count = checkin_done
+                insight_report.average_mood = avg_mood
+                insight_report.top_habits_json = json.dumps(top_habits, ensure_ascii=False)
+                insight_report.what_we_noticed = json.dumps(noticed_patterns, ensure_ascii=False)
+                insight_report.goals_snapshot = current_user.selected_goals
+                insight_report.habits_snapshot_json = json.dumps(top_habits, ensure_ascii=False)
 
             if reflection:
+
+                recommendations_json = None
+                recommendation_source = None
+
+                if recommendations:
+                    if recommendations[0].get("is_fallback"):
+                        recommendation_source = "fallback"
+                    else:
+                        recommendations_json = json.dumps(
+                            recommendations,
+                            ensure_ascii=False
+                        )
+                        recommendation_source = "location_api"
+
                 premium_insight = PremiumInsight(
                     insight_report_id=insight_report.id,
                     reflection_text=reflection["text"],
                     reflection_source="json_template",
-                    recommendations_json=json.dumps(recommendations, ensure_ascii=False),
-                    recommendation_source="dummy"
+
+                    recommendations_json=recommendations_json,
+                    recommendation_source=recommendation_source,
+
+                    location_latitude=session.get("location_latitude"),
+                    location_longitude=session.get("location_longitude"),
+                    location_label="Browser location" if session.get("location_latitude") else None
                 )
 
                 db.session.add(premium_insight)
@@ -1126,6 +1086,11 @@ def insights():
             e
         )
 
+    has_history = (
+            db.session.query(InsightReport.id)
+            .filter_by(user_id=current_user.id)
+            .first() is not None
+    )
     return render_template(
         "insights.html",
         date_range=date_range,
@@ -1137,7 +1102,9 @@ def insights():
         noticed_patterns=noticed_patterns,
         is_premium=is_premium,
         reflection=reflection,
-        recommendations=recommendations
+        recommendations=recommendations,
+        has_history=has_history,
+        history_mode=False
     )
 
 
@@ -1159,5 +1126,278 @@ def save_location():
         latitude,
         longitude
     )
-
     return {"success": True}
+
+
+@main.route("/insights/history")
+@login_required
+@premium_required
+def insight_history():
+    reports = (
+        InsightReport.query
+        .filter_by(user_id=current_user.id)
+        .order_by(InsightReport.created_at.desc())
+        .all()
+    )
+
+    if not reports:
+        flash(
+            "Your completed insight reports will appear here after your first insight cycle.",
+            "info"
+        )
+        return redirect(url_for("main.insights"))
+
+    selected_period = request.args.get("period", "1m")
+
+    today = datetime.now(UTC).date()
+
+    period_days = {
+        "1m": 30,
+        "3m": 90,
+        "6m": 180,
+        "1y": 365
+    }
+
+    days = period_days.get(selected_period, 30)
+    start_date = today - timedelta(days=days)
+
+    reports = (
+        InsightReport.query
+        .filter(
+            InsightReport.user_id == current_user.id,
+            InsightReport.period_start >= start_date
+        )
+        .order_by(InsightReport.created_at.desc())
+        .all()
+    )
+
+    records = []
+
+    for report in reports:
+        records.append({
+            "id": report.id,
+            "date_range": (
+                f"{report.period_start.strftime('%d %b %Y')} - "
+                f"{report.period_end.strftime('%d %b %Y')}"
+            ),
+            "days": report.checkin_count,
+            "average_mood": report.average_mood,
+            "checkin_count": report.checkin_count
+        })
+
+    return render_template(
+        "insight_history.html",
+        selected_period=selected_period,
+        records=records,
+        get_mood_emoji=get_mood_emoji
+    )
+
+@main.route("/insights/history/<int:report_id>")
+@login_required
+@premium_required
+def insight_detail(report_id):
+    report = (
+        InsightReport.query
+        .filter_by(
+            id=report_id,
+            user_id=current_user.id
+        )
+        .first_or_404()
+    )
+
+    premium = report.premium_insight
+
+    top_habits = json.loads(report.top_habits_json or "[]")
+    noticed_patterns = json.loads(report.what_we_noticed or "[]")
+
+    reflection = None
+    recommendations = []
+
+    if premium:
+        if premium.reflection_text:
+            reflection = {
+                "text": premium.reflection_text,
+                "habit": top_habits[0]["name"] if top_habits else None,
+                "emoji": top_habits[0]["emoji"] if top_habits else "✨"
+            }
+
+        if premium.recommendations_json:
+            recommendations = json.loads(premium.recommendations_json)
+
+    date_range = (
+        f"{report.period_start.strftime('%d %b %Y')} - "
+        f"{report.period_end.strftime('%d %b %Y')}"
+    )
+
+    return render_template(
+        "insights.html",
+        date_range=date_range,
+        checkin_done=report.checkin_count,
+        checkin_total=7,
+        avg_mood=report.average_mood,
+        mood_emoji=get_mood_emoji(report.average_mood),
+        top_habits=top_habits,
+        noticed_patterns=noticed_patterns,
+        is_premium=True,
+        reflection=reflection,
+        recommendations=recommendations,
+        history_mode=True
+    )
+
+
+
+'''
+# ═══════════════════════════════════════════════════════════════
+# Development Utilities (Remove before production)
+# ═══════════════════════════════════════════════════════════════
+#
+# These routes are used ONLY during development to regenerate
+# different parts of the Insight feature without completing a
+# new 5–7 day check-in cycle.
+#
+# /dev/reset-reflection
+#     Clears the saved reflection only.
+#     The next visit to /insights regenerates the reflection
+#     using the latest reflection engine and tone templates.
+#
+# /dev/reset-recommendations
+#     Clears the saved location recommendations only.
+#     The next visit to /insights calls the recommendation APIs
+#     (OpenStreetMap/Ticketmaster or future providers) again.
+#
+# /dev/reset-latest-insight
+#     Deletes the latest saved insight snapshot
+#     (InsightReport + PremiumInsight) without deleting
+#     any user check-ins.
+#
+#     This forces the entire insight to regenerate using the
+#     existing check-in data and is useful when testing changes
+#     to:
+#         • Top Habits
+#         • What We Noticed
+#         • Reflection generation
+#         • Recommendation generation
+#         • Insight snapshot saving
+#
+# NOTE:
+# These routes should NOT be available in production.
+# Remove them or restrict them to Flask DEBUG mode before deployment.
+# ═══════════════════════════════════════════════════════════════
+
+
+@main.route("/dev/reset-recommendations")
+@login_required
+def reset_recommendations():
+
+    latest_report = (
+        InsightReport.query
+        .filter_by(user_id=current_user.id)
+        .order_by(InsightReport.created_at.desc())
+        .first()
+    )
+
+    if not latest_report or not latest_report.premium_insight:
+        flash("No premium insight found.", "warning")
+        return redirect(url_for("main.insights"))
+
+    premium = latest_report.premium_insight
+
+    premium.recommendations_json = None
+    premium.recommendation_source = None
+
+    db.session.commit()
+
+    flash(
+        "Recommendations reset. Refresh Insights to generate new recommendations.",
+        "success"
+    )
+
+    return redirect(url_for("main.insights"))
+
+@main.route("/dev/reset-latest-insight")
+@login_required
+def reset_latest_insight():
+    if current_user.is_free():
+        current = CurrentInsight.query.filter_by(
+            user_id=current_user.id
+        ).first()
+
+        if current:
+            db.session.delete(current)
+            db.session.commit()
+            flash("Current insight reset. It will regenerate from existing check-ins.", "success")
+        else:
+            flash("No current insight found.", "warning")
+
+        return redirect(url_for("main.insights"))
+
+    latest_report = (
+        InsightReport.query
+        .filter_by(user_id=current_user.id)
+        .order_by(InsightReport.created_at.desc())
+        .first()
+    )
+
+    if latest_report:
+        if latest_report.premium_insight:
+            db.session.delete(latest_report.premium_insight)
+
+        db.session.delete(latest_report)
+        db.session.commit()
+
+        flash("Latest premium insight reset. It will regenerate from existing check-ins.", "success")
+    else:
+        flash("No premium insight report found.", "warning")
+
+    return redirect(url_for("main.insights"))
+
+@main.route("/dev/reset-reflection")
+@login_required
+def reset_reflection():
+    latest_report = (
+        InsightReport.query
+        .filter_by(user_id=current_user.id)
+        .order_by(InsightReport.created_at.desc())
+        .first()
+    )
+
+    if not latest_report or not latest_report.premium_insight:
+        flash("No premium insight found.", "warning")
+        return redirect(url_for("main.insights"))
+
+    premium = latest_report.premium_insight
+    premium.reflection_text = None
+    premium.reflection_source = None
+
+    db.session.commit()
+
+    flash("Reflection reset. Refresh Insights to generate a new reflection.", "success")
+    return redirect(url_for("main.insights"))
+
+@main.route("/dev/clear-insight-history")
+@login_required
+def clear_insight_history():
+
+    reports = InsightReport.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
+    for report in reports:
+        if report.premium_insight:
+            db.session.delete(report.premium_insight)
+
+        db.session.delete(report)
+
+    current = CurrentInsight.query.filter_by(
+        user_id=current_user.id
+    ).first()
+
+    if current:
+        db.session.delete(current)
+
+    db.session.commit()
+
+    flash("Insight history cleared.", "success")
+    return redirect(url_for("main.dashboard"))
+
+'''

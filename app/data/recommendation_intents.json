@@ -1,0 +1,20 @@
+{
+  "Exercise 30 min": ["gym", "park"],
+  "Walk 8k+ steps": ["park", "trail"],
+  "Stretch or yoga": ["yoga", "park"],
+  "Sleep 7+ hours": ["park", "wellness"],
+  "Consistent bedtime": ["park", "quiet_space"],
+  "No screens before bed": ["library", "park"],
+  "Drink 2L water": ["cafe", "park"],
+  "Eat fruits or vegetables": ["market", "healthy_food"],
+  "No junk food": ["market", "healthy_food"],
+  "Meditation or breathing": ["park", "wellness"],
+  "Journaling": ["library", "cafe", "park"],
+  "Time outdoors": ["park", "trail"],
+  "Connect with someone": ["cafe", "event"],
+  "Limit social media": ["park", "library"],
+  "Help someone": ["community", "event"],
+  "Read 20 minutes": ["library", "museum"],
+  "Learn something new": ["museum", "event"],
+  "Practice gratitude": ["park", "garden"]
+}

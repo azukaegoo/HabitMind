@@ -1,0 +1,86 @@
+{
+  "Physical": [
+    {
+      "emoji": "🚶",
+      "title": "Take a short walk nearby",
+      "subtitle": "A simple movement activity that can support your mood.",
+      "tag": "Movement"
+    },
+    {
+      "emoji": "🧘",
+      "title": "Do a short stretch session",
+      "subtitle": "A gentle activity to support flexibility and relaxation.",
+      "tag": "Wellness"
+    }
+  ],
+  "Sleep": [
+    {
+      "emoji": "🌙",
+      "title": "Plan a calm evening routine",
+      "subtitle": "A quiet activity that can support better sleep habits.",
+      "tag": "Rest"
+    },
+    {
+      "emoji": "📵",
+      "title": "Try a screen-free wind-down",
+      "subtitle": "A simple way to prepare your body and mind for rest.",
+      "tag": "Sleep"
+    }
+  ],
+  "Nutrition": [
+    {
+      "emoji": "🥗",
+      "title": "Prepare a simple healthy snack",
+      "subtitle": "A small nutrition choice that supports your wellbeing.",
+      "tag": "Food"
+    },
+    {
+      "emoji": "💧",
+      "title": "Refill your water bottle",
+      "subtitle": "A quick action that supports hydration.",
+      "tag": "Hydration"
+    }
+  ],
+  "Mental": [
+    {
+      "emoji": "🧘",
+      "title": "Try a short breathing session",
+      "subtitle": "A calm activity that supports mental wellbeing.",
+      "tag": "Calm"
+    },
+    {
+      "emoji": "📓",
+      "title": "Write a short journal note",
+      "subtitle": "A simple reflection activity to notice your thoughts.",
+      "tag": "Reflection"
+    }
+  ],
+  "Social": [
+    {
+      "emoji": "👥",
+      "title": "Message someone you trust",
+      "subtitle": "A small social connection can support your mood.",
+      "tag": "Social"
+    },
+    {
+      "emoji": "🤝",
+      "title": "Offer help to someone",
+      "subtitle": "A simple supportive action that builds connection.",
+      "tag": "Community"
+    }
+  ],
+  "Growth": [
+    {
+      "emoji": "📚",
+      "title": "Read for a few minutes",
+      "subtitle": "A small learning activity that supports personal growth.",
+      "tag": "Growth"
+    },
+    {
+      "emoji": "🧠",
+      "title": "Learn one new thing",
+      "subtitle": "A short learning moment can support motivation.",
+      "tag": "Learning"
+    }
+  ]
+}
