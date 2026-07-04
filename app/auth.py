@@ -135,8 +135,9 @@ def change_password():
     current_user.set_password(new_pw)
     db.session.commit()
     
-    flash('Password successfully updated!', 'success')
-    return redirect(url_for('main.settings'))
+    logout_user() 
+    flash('Password successfully updated! Please log in again with your new password.', 'success')
+    return redirect(url_for('auth.login'))
 
 # ═══════════════════════════════════════════
 # PASSWORD RESET LOGIC (Forgot Password - 6 Digit OTP)
