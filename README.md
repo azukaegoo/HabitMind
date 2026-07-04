@@ -229,7 +229,7 @@ To keep the project aligned:
 
 ---
 ## Team Memebers
-Gloria Azum
-Safreena Kokk Adan
-Dohyeop Shim
-Temitope Abejide
+- Gloria Azum
+- Safreena Kokk Adan
+- Dohyeop Shim
+- Temitope Abejide
