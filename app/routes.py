@@ -1321,9 +1321,6 @@ def reset_reflection():
     flash("Reflection reset. Refresh Insights to generate a new reflection.", "success")
     return redirect(url_for("main.insights"))
 
-'''
-
-
 @main.route("/dev/clear-insight-history")
 @login_required
 def clear_insight_history():
@@ -1350,3 +1347,4 @@ def clear_insight_history():
     flash("Insight history cleared.", "success")
     return redirect(url_for("main.dashboard"))
 
+'''
