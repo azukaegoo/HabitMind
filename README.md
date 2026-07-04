@@ -176,7 +176,6 @@ To keep the project aligned:
 
 * [Setup Guide](docs/setup.md)
 * [Architecture](docs/architecture.md)
-* [Database Documentation](docs/database.md)
 
 ---
 ### Team Members
