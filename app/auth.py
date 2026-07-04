@@ -111,19 +111,22 @@ def logout():
     return redirect(url_for('auth.login'))
 
 # ═══════════════════════════════════════════
-# CHANGE PASSWORD (From Settings)
+# CHANGE PASSWORD
 # ═══════════════════════════════════════════
-@auth_bp.route('/change-password', methods=['POST'])
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
 def change_password():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
         
-    old_password = request.form.get('old_password')
+    if request.method == 'GET':
+        return render_template('change_password.html')
+        
+    old_password = request.form.get('current_password') 
     new_password = request.form.get('new_password')
     
     if not current_user.check_password(old_password):
         flash('Incorrect current password.', 'error')
-        return redirect(url_for('main.settings'))
+        return redirect(url_for('auth.change_password')) 
         
     current_user.set_password(new_password)
     db.session.commit()
@@ -166,13 +169,15 @@ def forgot_password():
                           recipients=[user.email])
             
             reset_url = url_for('auth.reset_password', token=token, _external=True)
+            
             msg.body = f"To reset your password, visit the following link:\n{reset_url}\n\nIf you did not make this request, simply ignore this email and no changes will be made."
             
             try:
                 mail.send(msg)
                 print(f"DEBUG: Reset email sent to {user.email}")
             except Exception as e:
-                print(f"DEBUG: Mail Error - {e}")
+                # Ignore mail sending errors in local environment since we have the console link
+                print(f"DEBUG: Mail Error (Ignored in local dev) - {e}")
                 
         flash('If an account with that email exists, a reset link has been sent.', 'info')
         return redirect(url_for('auth.login'))
