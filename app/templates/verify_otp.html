@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enter Code — HabitMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+  {% include "components/flash_messages.html" %}
+  <div class="w-full max-w-md bg-gray-800 p-8 rounded-2xl border border-gray-700">
+    <h1 class="text-2xl font-bold text-white mb-2">Enter Verification Code</h1>
+    <p class="text-gray-400 text-sm mb-6">We sent a 6-digit code to your email. Please enter it below.</p>
+    
+    <form action="/verify-otp" method="POST" class="flex flex-col gap-4">
+      <input type="text" name="otp" placeholder="123456" required maxlength="6"
+        class="w-full px-4 py-3 rounded-xl bg-gray-700 border border-gray-600 text-white text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+      <button type="submit" class="w-full py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all">
+        Verify Code
+      </button>
+    </form>
+  </div>
+</body>
+</html>
