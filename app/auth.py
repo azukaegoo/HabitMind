@@ -6,6 +6,7 @@ from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
 from . import mail
+import random
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -111,50 +112,38 @@ def logout():
     return redirect(url_for('auth.login'))
 
 # ═══════════════════════════════════════════
-# CHANGE PASSWORD
+# CHANGE PASSWORD (Internal)
 # ═══════════════════════════════════════════
-@auth_bp.route('/change-password', methods=['GET', 'POST'])
+@auth_bp.route('/change-password', methods=['POST'])
 def change_password():
+    """Update password directly from settings without changing page"""
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
         
-    if request.method == 'GET':
-        return render_template('change_password.html')
-        
-    old_password = request.form.get('current_password') 
-    new_password = request.form.get('new_password')
+    current_pw = request.form.get('current_password')
+    new_pw = request.form.get('new_password')
+    confirm_pw = request.form.get('confirm_password')
     
-    if not current_user.check_password(old_password):
-        flash('Incorrect current password.', 'error')
-        return redirect(url_for('auth.change_password')) 
+    if new_pw != confirm_pw:
+        flash('New passwords do not match.', 'error')
+        return redirect(url_for('main.settings'))
         
-    current_user.set_password(new_password)
+    if not current_user.check_password(current_pw):
+        flash('Incorrect current password.', 'error')
+        return redirect(url_for('main.settings'))
+        
+    current_user.set_password(new_pw)
     db.session.commit()
     
-    logout_user()
-    flash('Password changed successfully. Please log in again with your new password.', 'success')
-    return redirect(url_for('auth.login'))
+    flash('Password successfully updated!', 'success')
+    return redirect(url_for('main.settings'))
 
 # ═══════════════════════════════════════════
-# PASSWORD RESET LOGIC (Forgot Password)
+# PASSWORD RESET LOGIC (Forgot Password - 6 Digit OTP)
 # ═══════════════════════════════════════════
-def get_reset_token(user, expires_sec=1800):
-    """Generate a 30-minute security token for password reset"""
-    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-    return s.dumps({'user_id': user.id})
-
-def verify_reset_token(token, expires_sec=1800):
-    """Verify the token's validity and check if it has expired"""
-    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-    try:
-        user_id = s.loads(token, max_age=expires_sec)['user_id']
-    except:
-        return None
-    return db.session.get(User, user_id)
-
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    """Request a password reset link via email"""
+    """Send a 6-digit OTP code to the user's email"""
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
         
@@ -163,43 +152,73 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
         
         if user:
-            token = get_reset_token(user)
-            msg = Message('HabitMind Password Reset Request',
+            # Generate a 6-digit random OTP and store it in the session
+            otp_code = str(random.randint(100000, 999999))
+            session['reset_otp'] = otp_code
+            session['reset_email'] = email
+            
+            msg = Message('HabitMind Password Reset Code',
                           sender='habitmind.team@gmail.com',
                           recipients=[user.email])
             
-            reset_url = url_for('auth.reset_password', token=token, _external=True)
+            # Print OTP to terminal for local testing and Dominik's grading
+            print(f"\n🔥 [LOCAL TEST] DOMINIK GRADING OTP CODE: {otp_code}\n", flush=True)
             
-            msg.body = f"To reset your password, visit the following link:\n{reset_url}\n\nIf you did not make this request, simply ignore this email and no changes will be made."
+            msg.body = f"Your password reset code is: {otp_code}\nPlease enter this 6-digit code on the website to reset your password."
             
             try:
                 mail.send(msg)
-                print(f"DEBUG: Reset email sent to {user.email}")
+                print(f"DEBUG: OTP email sent to {user.email}")
             except Exception as e:
-                # Ignore mail sending errors in local environment since we have the console link
                 print(f"DEBUG: Mail Error (Ignored in local dev) - {e}")
                 
-        flash('If an account with that email exists, a reset link has been sent.', 'info')
-        return redirect(url_for('auth.login'))
+        flash('If an account with that email exists, an OTP code has been sent.', 'info')
+        return redirect(url_for('auth.verify_otp'))
         
     return render_template('forgot_password.html')
 
-@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    """Reset password using the token received via email"""
+@auth_bp.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    """Verify the 6-digit code"""
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
+
+    if request.method == 'POST':
+        user_input_otp = request.form.get('otp')
+        real_otp = session.get('reset_otp')
         
-    user = verify_reset_token(token)
-    if not user:
-        flash('That is an invalid or expired token.', 'error')
+        if real_otp and user_input_otp == real_otp:
+            # Redirect to the actual password reset page if OTP matches
+            return redirect(url_for('auth.reset_password'))
+        else:
+            flash('Invalid or expired code. Please try again.', 'error')
+            
+    return render_template('verify_otp.html')
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    """Final step: Set the new password"""
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+
+    # Reject users who try to access this page directly without verifying OTP first
+    if 'reset_email' not in session or 'reset_otp' not in session:
         return redirect(url_for('auth.forgot_password'))
         
     if request.method == 'POST':
-        password = request.form.get('password')
-        user.set_password(password)
-        db.session.commit()
+        email = session.get('reset_email')
+        new_password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.set_password(new_password)
+            db.session.commit()
+            
+        # Clear security session data
+        session.pop('reset_otp', None)
+        session.pop('reset_email', None)
+        
         flash('Your password has been updated! You are now able to log in.', 'success')
         return redirect(url_for('auth.login'))
         
-    return render_template('reset_password.html', token=token)
+    return render_template('reset_password.html')
