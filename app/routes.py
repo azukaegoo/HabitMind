@@ -10,6 +10,10 @@ from .services.insight_helpers import (
     generate_noticed_patterns,
     generate_reflection
 )
+from .services.dashboard_helpers import (
+    calculate_streak,
+    get_mood_emoji
+)
 import json
 from flask_login import login_required, current_user, logout_user
 from datetime import datetime, UTC, timedelta
@@ -32,64 +36,6 @@ def premium_required(f):
             return redirect(url_for('main.dashboard'))
         return f(*args, **kwargs)
     return decorated_function
-
-
-# ═══════════════════════════════════════════
-# Helper functions
-# ═══════════════════════════════════════════
-def calculate_streak(user_id):
-    today = datetime.now(UTC).date()
-
-    checkins = (
-        CheckIn.query
-        .filter_by(user_id=user_id)
-        .order_by(CheckIn.date.desc())
-        .all()
-    )
-
-    if not checkins:
-        return 0
-
-    latest_date = checkins[0].date
-
-    if latest_date == today:
-        expected_date = today
-    elif latest_date == today - timedelta(days=1):
-        expected_date = today - timedelta(days=1)
-    else:
-        return 0
-
-    streak = 0
-
-    for checkin in checkins:
-        if checkin.date == expected_date:
-            streak += 1
-            expected_date -= timedelta(days=1)
-        else:
-            break
-
-    return streak
-
-def get_mood_emoji(avg_mood):
-    if avg_mood is None:
-        return "—"
-
-    rounded_mood = round(avg_mood)
-
-    mood_emojis = {
-        1: "😭",
-        2: "😰",
-        3: "😟",
-        4: "🙁",
-        5: "😐",
-        6: "🙂",
-        7: "😊",
-        8: "😄",
-        9: "😁",
-        10: "🤩",
-    }
-
-    return mood_emojis.get(rounded_mood, "😐")
 
 
 # ═══════════════════════════════════════════
@@ -905,14 +851,17 @@ def insights():
                     print("DEBUG regenerating recommendations", flush=True)
                     print("DEBUG latitude:", session.get("location_latitude"), flush=True)
                     print("DEBUG longitude:", session.get("location_longitude"), flush=True)
-                    print("DEBUG habit:", top_habits[0]["name"] if top_habits else None, flush=True)
+                    print(
+                        "DEBUG top habits:",
+                        [habit["name"] for habit in top_habits],
+                        flush=True
+                    )
 
                     if latitude and longitude:
                         recommendations = get_location_recommendations(
                             latitude=latitude,
                             longitude=longitude,
-                            habit_name=top_habits[0]["name"] if top_habits else "Time outdoors",
-                            category=top_habits[0]["category"] if top_habits else "Mental"
+                            top_habits=top_habits
                         )
 
 
@@ -978,7 +927,6 @@ def insights():
     recommendations = []
 
     if is_premium and top_habits:
-        main_habit = top_habits[0]
 
         reflection = generate_reflection(
             top_habits=top_habits,
@@ -993,8 +941,7 @@ def insights():
             recommendations = get_location_recommendations(
                 latitude=latitude,
                 longitude=longitude,
-                habit_name=main_habit["name"],
-                category=main_habit["category"]
+                top_habits=top_habits
             )
         else:
             recommendations = []
@@ -1192,6 +1139,7 @@ def insight_history():
         get_mood_emoji=get_mood_emoji
     )
 
+
 @main.route("/insights/history/<int:report_id>")
 @login_required
 @premium_required
@@ -1243,7 +1191,6 @@ def insight_detail(report_id):
         recommendations=recommendations,
         history_mode=True
     )
-
 
 
 '''

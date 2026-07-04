@@ -1,10 +1,7 @@
-import sys
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash
 from flask_login import login_user, logout_user, current_user 
 from .models import db, User
 from flask_mail import Message
-from itsdangerous import URLSafeTimedSerializer
-from flask import current_app
 from . import mail
 import random
 
@@ -13,7 +10,9 @@ auth_bp = Blueprint('auth', __name__)
 # ═══════════════════════════════════════════
 # SIGN UP & REGISTER
 # ═══════════════════════════════════════════
-#sign up route
+
+
+# sign up route
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -162,8 +161,8 @@ def forgot_password():
                           sender='habitmind.team@gmail.com',
                           recipients=[user.email])
             
-            # Print OTP to terminal for local testing and Dominik's grading
-            print(f"\n🔥 [LOCAL TEST] DOMINIK GRADING OTP CODE: {otp_code}\n", flush=True)
+            # Print OTP to terminal for local testing
+            print(f"\n [LOCAL TEST] OTP CODE: {otp_code}\n", flush=True)
             
             msg.body = f"Your password reset code is: {otp_code}\nPlease enter this 6-digit code on the website to reset your password."
             
