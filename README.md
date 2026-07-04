@@ -86,7 +86,6 @@ Premium users receive:
 * Personalized activity recommendations
 * Insight history
 * Data export
-* Location-based recommendations (planned)
 
 ---
 
@@ -104,10 +103,9 @@ Premium users receive:
 
 * Everything in Free
 * Personalized reflections
-* Activity recommendations
+* Personalizied location-based activity recommendations
 * Insight history
 * Data export
-* location-based recommendations
 
 ---
 
@@ -130,7 +128,7 @@ Premium users receive:
 ### Development Tools
 
 * Docker
-* Docker Compose
+* Docker Compos
 * Git
 * GitHub
 * GitHub Actions
@@ -139,6 +137,8 @@ Premium users receive:
 ---
 
 ## Getting Started
+
+Note: Respository secret are not passed on to forked repository. To test all features fully, test via this repository codespace
 
 ### 1. Clone the Repository
 
@@ -186,11 +186,6 @@ pytest
 ---
 
 ## Future Enhancements
-
-* Ticketmaster activity integration
-* OpenStreetMap location recommendations
-* Advanced habit analytics
-* Goal-specific recommendations
 * Mobile application support
 * Social accountability features
 
@@ -209,7 +204,7 @@ pytest
 
 * Assist with debugging errors, including Docker and database issues
 * Help generate tests when needed
-* Support documentation and code review workflows
+* Support documentation and code review workflows with codex
 
 AI is used as a development assistant, while all final decisions remain with the team.
 
@@ -231,3 +226,10 @@ To keep the project aligned:
 * [Setup Guide](docs/setup.md)
 * [Architecture](docs/architecture.md)
 * [Database Documentation](docs/database.md)
+
+---
+## Team Memebers
+Gloria Azum
+Safreena Kokk Adan
+Dohyeop Shim
+Temitope Abejide
