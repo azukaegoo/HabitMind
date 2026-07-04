@@ -228,7 +228,7 @@ To keep the project aligned:
 * [Database Documentation](docs/database.md)
 
 ---
-## Team Memebers
+### Team Members
 Gloria Azum<br>
 Safreena Kokk Adan<br>
 Dohyeop Shim<br>
