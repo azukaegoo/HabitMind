@@ -107,7 +107,7 @@ Premium users receive:
 * Activity recommendations
 * Insight history
 * Data export
-* Future location-based recommendations
+* location-based recommendations
 
 ---
 
