@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from .config import Config
@@ -15,13 +14,6 @@ mail = Mail()
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.from_object(Config)
-
-    # Mail configuration using environment variables for security
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
     if test_config:
         app.config.update(test_config)

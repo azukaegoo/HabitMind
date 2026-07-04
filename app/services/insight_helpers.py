@@ -117,22 +117,75 @@ def get_recommendation_intents(habit_name):
     return intents_data.get(habit_name, ["park", "cafe"])
 
 
-def get_fallback_recommendations(category):
-    fallback_data = load_json_file("recommendation_fallback.json")
+def get_combined_recommendation_data(top_habits):
+    intents = []
+    categories = []
 
-    items = fallback_data.get(
-        category,
-        fallback_data.get("General", [])
+    for habit in top_habits:
+        intents.extend(
+            get_recommendation_intents(habit["name"])
+        )
+
+        if habit["category"] not in categories:
+            categories.append(habit["category"])
+
+    # Remove duplicate intents while preserving order
+    intents = list(dict.fromkeys(intents))
+
+    return intents, categories
+
+
+def get_fallback_recommendations(categories):
+    fallback_data = load_json_file(
+        "recommendation_fallback.json"
     )
 
-    for item in items:
-        item["is_fallback"] = True
-        item["url"] = None
-        item["lat"] = None
-        item["lon"] = None
+    recommendations = []
+    seen = set()
 
-    return items
+    for category in categories:
 
+        for item in fallback_data.get(category, []):
+
+            title = item["title"]
+
+            if title in seen:
+                continue
+
+            rec = item.copy()
+
+            rec["is_fallback"] = True
+            rec["url"] = None
+            rec["lat"] = None
+            rec["lon"] = None
+
+            recommendations.append(rec)
+            seen.add(title)
+
+            if len(recommendations) >= 3:
+                return recommendations
+
+    # Fill remaining slots
+    for item in fallback_data.get("General", []):
+
+        title = item["title"]
+
+        if title in seen:
+            continue
+
+        rec = item.copy()
+
+        rec["is_fallback"] = True
+        rec["url"] = None
+        rec["lat"] = None
+        rec["lon"] = None
+
+        recommendations.append(rec)
+
+        if len(recommendations) >= 3:
+            break
+
+    return recommendations
 
 def get_osm_query_parts(intents):
     mapping = {
@@ -345,10 +398,11 @@ def get_ticketmaster_recommendations(latitude, longitude, intents):
 def get_location_recommendations(
     latitude,
     longitude,
-    habit_name,
-    category
+    top_habits
 ):
-    intents = get_recommendation_intents(habit_name)
+    intents, categories = (
+        get_combined_recommendation_data(top_habits)
+    )
 
     recommendations = []
 
@@ -368,15 +422,31 @@ def get_location_recommendations(
         )
     )
 
-    print("DEBUG get_location_recommendations", flush=True)
-    print("DEBUG recommendations:", recommendations, flush=True)
+    # Remove duplicate places
+    unique = []
+    seen = set()
 
-    if recommendations:
-        return recommendations[:3]
+    for rec in recommendations:
+
+        key = rec["title"].strip().lower()
+
+        if key in seen:
+            continue
+
+        unique.append(rec)
+        seen.add(key)
+
+        if len(unique) >= 3:
+            break
+
+    print("DEBUG recommendations:", unique, flush=True)
+
+    if unique:
+        return unique
 
     print("DEBUG Using fallback recommendations", flush=True)
 
-    return get_fallback_recommendations(category)
+    return get_fallback_recommendations(categories)
 
 def build_top_habits(checkins, limit=3):
     habit_counter = Counter()
