@@ -10,103 +10,93 @@ The platform supports both Free and Premium experiences. Free users receive basi
 
 ## Features
 
-### User Accounts
-
+### User Accounts & Profile
 * User registration and login
 * Secure password hashing
 * Protected authenticated routes
-* User profile management
+* Inline password management directly within user settings
+* Secure 6-digit OTP (One-Time Password) email verification for password recovery
+* User profile with plan badges and statistics (Streak, Total Check-ins, Avg Mood)
+* Editable goals and habits overview
+
+### Onboarding Flow
+* Wellness goal selection across 6 categories (Sleep, Exercise, Mindfulness, Nutrition, Growth, Social)
+* Personalized habit selection based on goals
+* Dedicated onboarding completion screen
+
+### Dashboard
+* Personalized greeting
+* Check-in status card featuring current streak counter and average mood display
+* Weekly Reflection overview
 
 ### Habit Tracking
-
 Users can track habits across multiple wellness categories.
 
 #### Physical
-
 * Exercise for 30 minutes
 * Walk 8k+ steps
 * Stretch or practice yoga
 
 #### Sleep
-
 * Sleep 7+ hours
 * Keep a consistent bedtime
 * Avoid screens before bed
 
 #### Nutrition
-
 * Drink 2L of water
 * Eat fruits or vegetables
 * Avoid junk food
 
 #### Mental
-
 * Meditate or practice breathing exercises
 * Journal
 * Spend time outdoors
 
 #### Social
-
 * Connect with someone
 * Limit social media
 * Help someone
 
 #### Growth
-
 * Read for 20 minutes
 * Learn something new
 * Practice gratitude
 
-### Mood Check-ins
-
-* Mood rating from 1-10
+### Daily Check-in
+* Mood rating from 1-10 with interactive emojis
 * One check-in per day
 * Habit selection during check-in
-* Streak tracking
-* Average mood tracking
+* Check-in complete summary page
+* Streak tracking and average mood tracking
 
 ### Weekly Insights
-
-After at least five check-ins, HabitMind generates:
-
-* Average mood score
+After at least 7 check-ins, HabitMind generates:
+* Total check-ins tracker & Average mood calculation
 * Top habits associated with higher moods
-* Habit pattern observations
+* AI-detected habit patterns
 * Weekly mood summary
 
+### Insight History Page
+* Access ALL past weekly reflection reports
+* Filter insights by time period
+* "View Full Report" detailing past patterns
+
+### Settings & Account Management
+* Account management (email, password)
+* Quick settings access
+* Danger Zone: Cancel premium, delete account, clear history
+* Upgrade / downgrade flows with warnings
+
 ### Premium Features
-
 Premium users receive:
-
 * Personalized reflections
 * Reflection tone selection:
   * Supportive
   * Balanced
   * Challenging
-* Personalized activity recommendations
-* Insight history
+* Personalized location-based activity recommendations
+* Full insight history access
 * Data export
-
----
-
-## Subscription Plans
-
-### Free Plan
-
-* Daily check-ins
-* Mood tracking
-* Habit tracking
-* Weekly insights
-* Current insight only, without history
-
-### Premium Plan
-
-* Everything in Free
-* Personalized reflections
-* Personalizied location-based activity recommendations
-* Insight history
-* Data export
-
 ---
 
 ## Technology Stack
@@ -176,6 +166,7 @@ To keep the project aligned:
 
 * [Setup Guide](docs/setup.md)
 * [Architecture](docs/architecture.md)
+* [Authentication & Security Flow](docs/authentication.md)
 
 ---
 ### Team Members
