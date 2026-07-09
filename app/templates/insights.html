@@ -276,6 +276,11 @@
     </div>
     {% endif %}
 
+     {% if not current_user.is_premium() %}
+      {% set ad_type = "hiking" %}
+      {% include "components/sponsored_ad.html" %}
+      {% endif %}
+
     <!-- TIP CARD -->
     <div class="max-w-2xl mx-auto mb-5">
       <div class="rounded-2xl border p-4 flex items-center gap-3" style="background: #f0fdf4; border-color: #d8f3e6;">

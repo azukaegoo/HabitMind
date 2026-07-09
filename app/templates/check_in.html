@@ -116,8 +116,12 @@
           <p class="text-sm text-center py-4" style="color:#8aa89b;">No habits found. Your chosen habits will appear here.</p>
           {% endfor %}
         </div>
-      </div>
 
+      </div>
+        {% if not current_user.is_premium() %}
+        {% set ad_type = "spa" %}
+        {% include "components/sponsored_ad.html" %}
+        {% endif %}
     </form>
   </div>
 

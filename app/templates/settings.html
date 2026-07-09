@@ -368,6 +368,10 @@
         <p class="text-xs" style="color: #6d28d9;">Your data is private and secure. We never share your information.</p>
       </div>
     </div>
+      {% if not current_user.is_premium() %}
+      {% set ad_type = "hiking" %}
+      {% include "components/sponsored_ad.html" %}
+      {% endif %}
 
   </div>
 

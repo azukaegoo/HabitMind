@@ -150,6 +150,8 @@
     {% endif %}
 
       {% if not current_user.is_premium() %}
+      {% set ad_type = "fitness" %}
+      {% include "components/sponsored_ad.html" %}
       <div class="max-w-2xl mx-auto mb-5">
         <div class="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
           <div class="flex items-center gap-2 mb-3">
