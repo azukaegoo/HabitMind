@@ -136,6 +136,58 @@ Premium users receive:
 
 ---
 
+## Team Roles
+
+### Human Members
+
+* Define the design system and application architecture
+* Implement and integrate features
+* Review and test code before merging
+* Manage GitHub branches and pull requests
+
+### AI Assistance
+
+* Assist with debugging errors, including Docker and database issues
+* Help generate tests when needed
+* Support documentation and code review workflows with codex
+
+AI is used as a development assistant, while all final decisions remain with the team.
+
+---
+
+## Development Workflow
+
+To keep the project aligned:
+
+* The team agrees on architecture and design decisions before implementation.
+* GitHub is used for version control, pull requests, and tracking changes.
+* Code reviews help maintain consistency and correctness.
+* Tests are run with `pytest` to validate functionality.
+
+---
+
+## Future Enhancements
+* Mobile application support
+* Social accountability features
+
+---
+
+## Documentation
+
+* [Setup Guide](docs/setup.md)
+* [Architecture](docs/architecture.md)
+
+---
+### Team Members
+Gloria Azum<br>
+Safreena Kokk Adan<br>
+Dohyeop Shim<br>
+Temitope Abejide
+
+---
+
+
+
 ## Getting Started
 
 Note: Respository secret are not passed on to forked repository. To test all features fully, test via this repository codespace
@@ -182,54 +234,3 @@ This rebuilds the CSS whenever frontend styles change.
 ```bash
 pytest
 ```
-
----
-
-## Future Enhancements
-* Mobile application support
-* Social accountability features
-
----
-
-## Team Roles
-
-### Human Members
-
-* Define the design system and application architecture
-* Implement and integrate features
-* Review and test code before merging
-* Manage GitHub branches and pull requests
-
-### AI Assistance
-
-* Assist with debugging errors, including Docker and database issues
-* Help generate tests when needed
-* Support documentation and code review workflows with codex
-
-AI is used as a development assistant, while all final decisions remain with the team.
-
----
-
-## Development Workflow
-
-To keep the project aligned:
-
-* The team agrees on architecture and design decisions before implementation.
-* GitHub is used for version control, pull requests, and tracking changes.
-* Code reviews help maintain consistency and correctness.
-* Tests are run with `pytest` to validate functionality.
-
----
-
-## Documentation
-
-* [Setup Guide](docs/setup.md)
-* [Architecture](docs/architecture.md)
-* [Database Documentation](docs/database.md)
-
----
-### Team Members
-Gloria Azum<br>
-Safreena Kokk Adan<br>
-Dohyeop Shim<br>
-Temitope Abejide
